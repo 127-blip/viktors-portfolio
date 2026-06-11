@@ -15,7 +15,7 @@
     });
   });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="document.getElementById('sbError').style.display='block'"></script>
 <style>
 :root{
   --bg:#0B0B0B;--surface:#141414;--surface-2:#1C1C1C;
@@ -179,6 +179,11 @@ a{color:inherit;}button{font-family:inherit;cursor:pointer;}
 </style>
 </head>
 <body>
+<div id="sbError" style="display:none;position:fixed;inset:0;z-index:9999;background:#0B0B0B;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:#F5F0E8;font-family:Inter,sans-serif;">
+  <span style="font-size:32px;">⚠️</span>
+  <p style="font-size:15px;opacity:.8;">Verbindungsfehler – Bitte Seite neu laden.</p>
+  <button onclick="location.reload()" style="background:#C9A55A;color:#0B0B0B;border:none;padding:10px 22px;border-radius:2px;font-weight:600;cursor:pointer;font-size:13px;">Neu laden</button>
+</div>
 
 <!-- ADMIN APP -->
 <div id="adminApp">
@@ -528,6 +533,11 @@ const SB_URL="https://mvggueegxnrtfametfev.supabase.co";
 const SB_ANON="sb_publishable_xDvfOX2c5cJ3GvwPQb_MfA_ySFiyMu4";
 const SB_SERVICE="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12Z2d1ZWVneG5ydGZhbWV0ZmV2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQyMTE0MywiZXhwIjoyMDkxOTk3MTQzfQ.VlxSAJbWT6ixn912yIB2bFIZ43_IJ4dyBFZYPz7gi6Y";
 
+if (typeof supabase === 'undefined') {
+  const el = document.getElementById('sbError');
+  if (el) { el.style.display = 'flex'; }
+  throw new Error('Supabase CDN failed to load');
+}
 const { createClient } = supabase;
 const adminDb = createClient(SB_URL, SB_SERVICE, {
   auth: { autoRefreshToken: false, persistSession: false }
