@@ -600,8 +600,8 @@ body {
   gap: 12px;
 }
 .ccard__avatar {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
@@ -611,10 +611,14 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .ccard__avatar--img {
   object-fit: cover;
+  object-position: center top;
   background: none;
+  transform: scale(1.15);
+  transform-origin: center 20%;
 }
 .ccard__name {
   font-size: 15px;
