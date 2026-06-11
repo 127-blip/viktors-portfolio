@@ -424,6 +424,8 @@ body {
 .about {
   padding: 96px 40px;
   border-top: 1px solid var(--border);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .about__layout {
   display: grid;
@@ -431,6 +433,7 @@ body {
   gap: 60px;
   align-items: start;
   max-width: 980px;
+  margin: 0 auto;
 }
 .about__photo-wrap {
   position: sticky;
