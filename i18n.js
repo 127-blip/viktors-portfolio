@@ -82,7 +82,7 @@ const translations = {
 
     // ── Sanifair ──
     sf_tag:   "IoT Konzept · 2026",
-    sf_title: "Smart Cabin Monitor",
+    sf_title: "IoT Smart Cleaning: Intelligente Reinigungssteuerung",
     sf_sub:   "Bedarfsbasierte Ressourcensteuerung durch LoRaWAN-Sensorik – Ein interaktiver B2B-Prototyp zur Reduktion von Betriebskosten um bis zu 40%.",
     sf_idea_headline: "Reinigung nach Zeitplan<br>ist teuer und ineffizient.",
     sf_idea_body:     "Öffentliche Toiletten werden in festen Intervallen gereinigt, egal ob eine Kabine zehnmal oder keinmal genutzt wurde. Das kostet Personal, Zeit und Geld. Die Idee: Sensoren erkennen wann eine Kabine wirklich Reinigung braucht.",
@@ -271,7 +271,7 @@ const translations = {
 
     // ── Sanifair ──
     sf_tag:   "IoT Concept · 2026",
-    sf_title: "Smart Cabin Monitor",
+    sf_title: "IoT Smart Cleaning: Intelligent Cleaning Control",
     sf_sub:   "Demand-based resource management via LoRaWAN sensors – An interactive B2B prototype reducing operational costs by up to 40%.",
     sf_idea_headline: "Schedule-based cleaning<br>is expensive and inefficient.",
     sf_idea_body:     "Public restrooms are cleaned at fixed intervals, regardless of whether a cabin was used ten times or not at all. This wastes staff time and money. The idea: sensors detect when a cabin actually needs cleaning.",
