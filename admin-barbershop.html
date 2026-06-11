@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Barbershop Demo — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://js-de.sentry-cdn.com/0455e806b02cef614937bbde1e6997d2.min.js" crossorigin="anonymous"></script>
+<script>
+  Sentry.onLoad(function(){
+    Sentry.init({
+      dsn:"https://0455e806b02cef614937bbde1e6997d2@o4511309051723776.ingest.de.sentry.io/4511309063782480",
+      environment:"production",
+      tracesSampleRate: 0
+    });
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0B0B0B;--surface:#141414;--surface-2:#1C1C1C;
+  --fg:#F5F0E8;--fg-dim:#8A8580;--fg-mute:#3A3834;
+  --gold:#C9A55A;--gold-2:#E4C87A;--line:#222;
+  --green:#8BCC9F;--red:#E88;
+  --serif:"Fraunces",Georgia,serif;--sans:"Inter",system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--bg);color:var(--fg);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;}
+a{color:inherit;}button{font-family:inherit;cursor:pointer;}
+
+/* LAYOUT */
+#adminApp{display:block;min-height:100vh;}
+.admin-nav{background:var(--surface);border-bottom:1px solid var(--line);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.admin-nav-brand{display:flex;align-items:center;gap:10px;}
+.admin-mark{width:32px;height:32px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;color:var(--gold);font-size:17px;}
+.admin-nav-title{font-family:var(--serif);font-size:18px;}
+.admin-nav-badge{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;background:rgba(201,165,90,0.1);color:var(--gold);border:1px solid rgba(201,165,90,0.3);padding:3px 8px;border-radius:100px;}
+.admin-nav-right{display:flex;align-items:center;gap:16px;}
+.admin-nav-brand{display:flex;align-items:center;gap:10px;}
+.admin-nav-badge{margin-left:4px;}
+.btn-ghost{background:none;border:1px solid var(--line);color:var(--fg-dim);padding:8px 14px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;transition:all 0.2s;}
+.btn-ghost:hover{color:var(--fg);border-color:var(--fg);}
+.export-period-btn{padding:10px;background:var(--bg);border:1px solid var(--line);color:var(--fg-dim);font-family:var(--sans);font-size:12px;font-weight:500;border-radius:2px;cursor:pointer;transition:all 0.2s;}
+.export-period-btn:hover{border-color:var(--fg-mute);color:var(--fg);}
+.export-period-btn.active{background:rgba(201,165,90,0.08);border-color:var(--gold);color:var(--fg);}
+.ics-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px;}
+.ics-row:last-child{border-bottom:none;}
+.ics-row-date{color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap;margin-right:12px;}
+.ics-row-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.admin-body{max-width:960px;margin:0 auto;padding:40px 24px;}
+.admin-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:28px;align-items:start;}
+@media(max-width:700px){.admin-grid{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--line);padding:28px;}
+.card-title{font-family:var(--serif);font-size:22px;margin-bottom:4px;letter-spacing:-0.01em;}
+.card-sub{font-size:13px;color:var(--fg-dim);margin-bottom:24px;line-height:1.5;}
+
+/* FORM */
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:8px;font-weight:500;}
+.fg input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:13px 14px;font-family:var(--sans);font-size:15px;outline:none;transition:all 0.2s;border-radius:2px;}
+.fg input[type="time"]{text-align:center;padding:13px 10px;}
+.fg input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,165,90,0.1);}
+.fg input::placeholder{color:var(--fg-mute);}
+.method-toggle{display:flex;gap:6px;margin-bottom:16px;}
+.mtbtn{flex:1;padding:11px;background:var(--bg);border:1px solid var(--line);color:var(--fg-dim);font-family:var(--sans);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;border-radius:2px;cursor:pointer;}
+.mtbtn.active{background:rgba(201,165,90,0.08);border-color:var(--gold);color:var(--fg);}
+.btn-gold{width:100%;background:var(--gold);color:#0B0B0B;border:none;padding:15px;font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;transition:all 0.25s;border-radius:2px;position:relative;overflow:hidden;}
+.btn-gold:hover:not(:disabled){background:var(--gold-2);}
+.btn-gold:disabled{opacity:0.4;cursor:not-allowed;}
+.form-result{margin-top:14px;padding:14px 16px;border-radius:2px;font-size:13px;line-height:1.6;display:none;}
+.form-result.success{background:rgba(139,204,159,0.1);border:1px solid rgba(139,204,159,0.3);color:var(--green);}
+.form-result.error{background:rgba(232,136,136,0.1);border:1px solid rgba(232,136,136,0.3);color:var(--red);}
+.form-result.show{display:block;}
+
+/* USER LIST */
+.user-list{display:flex;flex-direction:column;gap:8px;}
+.user-item{background:var(--bg);border:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.2s;}
+.user-item:hover{border-color:var(--fg-mute);}
+.user-avatar{width:36px;height:36px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;color:var(--gold);font-size:16px;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:15px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-contact{font-size:12px;color:var(--fg-dim);}
+.user-date{font-size:11px;color:var(--fg-mute);text-align:right;flex-shrink:0;}
+.user-edit{background:none;border:none;font-size:14px;padding:4px 8px;transition:opacity 0.2s;border-radius:2px;flex-shrink:0;opacity:0.5;cursor:pointer;}
+.user-edit:hover{opacity:1;}
+.user-delete{background:none;border:none;color:var(--fg-mute);font-size:16px;padding:4px 8px;transition:color 0.2s;border-radius:2px;flex-shrink:0;}
+.user-delete:hover{color:var(--red);}
+.empty-list{text-align:center;padding:32px;color:var(--fg-dim);font-size:14px;border:1px dashed var(--line);}
+.list-loading{text-align:center;padding:24px;color:var(--fg-dim);font-size:13px;}
+
+/* STORNIERUNG NOTIFICATIONS */
+.cancel-inbox{background:rgba(232,136,136,0.06);border:1px solid rgba(232,136,136,0.3);border-radius:2px;margin-bottom:20px;overflow:hidden;}
+.cancel-inbox-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(232,136,136,0.2);}
+.cancel-inbox-title{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#E88;font-weight:600;display:flex;align-items:center;gap:8px;}
+.cancel-inbox-badge{background:#E88;color:#0B0B0B;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;}
+.cancel-item{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid rgba(232,136,136,0.1);}
+.cancel-item:last-child{border-bottom:none;}
+.cancel-item-info{flex:1;min-width:0;}
+.cancel-item-name{font-size:14px;font-weight:500;margin-bottom:2px;}
+.cancel-item-meta{font-size:12px;color:var(--fg-dim);}
+.cancel-ack-btn{background:none;border:1px solid rgba(232,136,136,0.4);color:#E88;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:2px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+.cancel-ack-btn:hover{background:rgba(232,136,136,0.15);}
+.cancel-inbox-foot{padding:10px 18px;display:flex;justify-content:flex-end;}
+.cancel-ack-all{background:none;border:none;color:var(--fg-dim);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:var(--sans);text-decoration:underline;padding:0;}
+
+/* STATS BAR */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.stat{background:var(--surface);border:1px solid var(--line);padding:16px 18px;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer;transition:border-color 0.2s,background 0.2s;}.stat:hover{border-color:var(--gold);background:var(--surface-2);}
+.stat-val{font-family:var(--serif);font-size:32px;color:var(--gold);letter-spacing:-0.02em;margin-bottom:4px;line-height:1;}
+.stat-lbl{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-dim);line-height:1.4;}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-wrap input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:12px 14px 12px 38px;font-family:var(--sans);font-size:14px;outline:none;border-radius:2px;transition:border-color 0.2s;}
+.search-wrap input:focus{border-color:var(--gold);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fg-mute);font-size:14px;pointer-events:none;}
+
+/* BOOKING SECTION */
+.bookings-card{margin-top:28px;}
+.booking-item{background:var(--bg);border:1px solid var(--line);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;transition:all 0.2s;}
+.booking-item:hover{border-color:var(--fg-mute);}
+.bk-svc{font-size:15px;margin-bottom:3px;}
+.bk-meta{font-size:12px;color:var(--fg-dim);}
+.bk-actions{display:flex;gap:6px;flex-shrink:0;}
+.bk-btn{padding:7px 12px;font-family:var(--sans);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;border:none;transition:all 0.2s;cursor:pointer;}
+.bk-btn-confirm{background:rgba(139,204,159,0.15);color:var(--green);border:1px solid rgba(139,204,159,0.3);}
+.bk-btn-confirm:hover{background:rgba(139,204,159,0.3);}
+.bk-btn-reject{background:rgba(232,136,136,0.1);color:var(--red);border:1px solid rgba(232,136,136,0.25);}
+.bk-btn-reject:hover{background:rgba(232,136,136,0.2);}
+.bk-status{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:5px 10px;border-radius:100px;}
+.st-pending{background:rgba(201,165,90,0.12);color:var(--gold);border:1px solid rgba(201,165,90,0.3);}
+.st-confirmed{background:rgba(139,204,159,0.12);color:var(--green);border:1px solid rgba(139,204,159,0.3);}
+.st-rejected{background:rgba(232,136,136,0.1);color:var(--red);border:1px solid rgba(232,136,136,0.25);}
+.st-cancel_attempted{background:rgba(232,136,136,0.15);color:#E88;border:1px solid rgba(232,136,136,0.4);animation:pulse-red 2s infinite;}
+@keyframes pulse-red{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.st-cancelled{background:var(--surface-2);color:var(--fg-dim);border:1px solid var(--line);}
+.st-no_show{background:rgba(180,60,60,0.18);color:#FF7070;border:1px solid rgba(180,60,60,0.45);}
+/* DAY CHECKBOXES */
+.day-cb{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:2px;cursor:pointer;font-size:13px;transition:all 0.2s;user-select:none;}
+.day-cb:has(input:checked){background:rgba(201,165,90,0.1);border-color:var(--gold);color:var(--fg);}
+.day-cb input{display:none;}
+.override-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border:1px solid var(--line);border-radius:2px;margin-bottom:6px;font-size:13px;}
+.override-item.closed{border-color:rgba(232,136,136,0.3);color:var(--red);}
+.override-item.custom{border-color:rgba(201,165,90,0.3);}
+
+.acal-hd{text-align:center;font-size:10px;text-transform:uppercase;color:var(--fg-dim);padding:6px 0;letter-spacing:0.15em;}
+.acal-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;cursor:pointer;transition:all 0.18s;position:relative;font-size:14px;gap:3px;}
+.acal-d.empty,.acal-d.closed{color:var(--fg-mute);cursor:default;pointer-events:none;background:transparent;}
+.acal-d.closed{opacity:0.3;}
+.acal-d.open{color:var(--fg);}
+.acal-d.open:hover{border-color:var(--gold);background:rgba(201,165,90,0.06);}
+.acal-d.sel{background:rgba(201,165,90,0.12);border-color:var(--gold);}
+.acal-d.today-mark{font-weight:700;}
+.acal-d.today-mark::after{content:"";position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--gold);border-radius:50%;}
+.acal-dots{display:flex;gap:2px;justify-content:center;}
+.acal-dot{width:5px;height:5px;border-radius:50%;}
+.day-slot{padding:12px 14px;border:1px solid var(--line);border-radius:2px;display:flex;flex-direction:column;gap:6px;background:var(--bg);}
+.day-slot.booked{border-color:rgba(201,165,90,0.4);background:rgba(201,165,90,0.05);}
+.day-slot.free{border-color:rgba(139,204,159,0.3);background:rgba(139,204,159,0.04);}
+.day-slot-time{font-size:16px;font-weight:600;}
+.day-slot-info{font-size:12px;color:var(--fg-dim);}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:10px 14px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--fg-dim);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.tab.active{color:var(--fg);border-bottom-color:var(--gold);}
+/* 2x2 main nav grid */
+.tab-grid{padding:14px 10px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--fg-dim);background:var(--surface);border:none;transition:all 0.2s;cursor:pointer;font-family:var(--sans);text-align:center;line-height:1.4;}
+.tab-grid:hover{background:var(--surface-2);color:var(--fg);}
+.tab-grid.active{background:rgba(201,165,90,0.1);color:var(--fg);box-shadow:inset 0 -2px 0 var(--gold);}
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);overflow-y:auto;}
+.overlay.open{display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.3s ease;}
+.modal{background:var(--bg);border:1px solid var(--line);width:100%;max-width:520px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;animation:modalIn 0.4s cubic-bezier(.2,.8,.2,1);overflow:hidden;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">
+      <div class="admin-mark">B</div>
+      <div class="admin-nav-title">Barbershop Demo</div>
+      <div class="admin-nav-badge">Admin</div>
+    </div>
+    <div class="admin-nav-right">
+      <span title="Verbinde…" id="rtIndicator" style="width:8px;height:8px;border-radius:50%;background:var(--fg-mute);flex-shrink:0;transition:background 0.4s;"></span>
+      <span style="font-size:12px;color:var(--fg-dim);">Hallo, Admin 👋</span>
+    </div>
+  </nav>
+
+  <div class="admin-body">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat" onclick="setMainTab('kunden',document.querySelectorAll('.tab-grid')[1])"><div class="stat-val" id="statUsers">—</div><div class="stat-lbl">Stammkunden</div></div>
+      <div class="stat" onclick="setMainTab('buchungen',document.querySelectorAll('.tab-grid')[0]);setBookingTab('pending',document.querySelectorAll('.tab')[0]);setTimeout(()=>document.getElementById('bookingList').scrollIntoView({behavior:'smooth'}),100)"><div class="stat-val" id="statPending">—</div><div class="stat-lbl">Buchungen zu bestätigen</div></div>
+      <div class="stat" onclick="setMainTab('kalender',document.querySelectorAll('.tab-grid')[2])"><div class="stat-val" id="statToday">—</div><div class="stat-lbl">Termine heute</div></div>
+    </div>
+
+    <!-- Stornierungsbenachrichtigungen -->
+    <div id="cancelInbox" style="display:none;"></div>
+
+    <!-- Main tabs: 2x2 grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:24px;">
+      <button class="tab-grid active" onclick="setMainTab('buchungen',this)">📋 Buchungen</button>
+      <button class="tab-grid" onclick="setMainTab('kunden',this)">👥 Stammkunden</button>
+      <button class="tab-grid" onclick="setMainTab('kalender',this)">📅 Kalender</button>
+      <button class="tab-grid" onclick="setMainTab('einstellungen',this)">⚙ Einstellungen</button>
+    </div>
+
+    <!-- TAB: Buchungen -->
+    <div id="tab-buchungen">
+      <div class="admin-grid">
+        <div class="card">
+          <div class="card-title">Stammkunde <em style="font-style:italic;color:var(--gold)">anlegen</em></div>
+          <p class="card-sub">Kunde wird sofort freigeschaltet und kann sich per Code einloggen.</p>
+          <div class="fg"><label>Name des Kunden</label><input type="text" id="newName" placeholder="Max Mustermann" autocomplete="off"></div>
+          <div class="fg"><label>E-Mail Adresse</label><input type="email" id="newContact" placeholder="kunde@gmail.com" autocomplete="off"></div>
+          <div class="fg"><label>Handynummer <span style="color:var(--fg-mute);font-weight:400;">(optional)</span></label><input type="tel" id="newPhone" placeholder="0160 12345678" autocomplete="off"></div>
+          <button class="btn-gold" id="addBtn" onclick="addCustomer()">Stammkunde anlegen</button>
+          <div class="form-result" id="formResult"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="card-title" style="margin-bottom:0;">Buchungen <em style="font-style:italic;color:var(--gold)">verwalten</em></div>
+            <button onclick="openManualBooking()" style="background:var(--gold);color:#0B0B0B;border:none;padding:9px 16px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;border-radius:2px;cursor:pointer;font-family:var(--sans);">+ Manuell buchen</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active" onclick="setBookingTab('pending',this)">Ausstehend</button>
+            <button class="tab" onclick="setBookingTab('confirmed',this)">Bestätigt</button>
+            <button class="tab" onclick="setBookingTab('all',this)">Alle</button>
+          </div>
+          <div id="bookingList"><div class="list-loading">Lade Buchungen …</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Stammkunden -->
+    <div id="tab-kunden" style="display:none;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">Stammkunden <em style="font-style:italic;color:var(--gold)">Übersicht</em></div>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" placeholder="Suchen …" oninput="filterUsers(this.value)" id="searchInput">
+        </div>
+        <div class="user-list" id="userList"><div class="list-loading">Lade Kunden …</div></div>
+      </div>
+
+      <!-- Kalender-Import Panel -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-title" style="margin-bottom:4px;">📅 Stammkunden aus Apple Kalender <em style="font-style:italic;color:var(--gold)">importieren</em></div>
+        <p class="card-sub">ICS-Datei einlesen → Kunden nach Name gruppiert → einzeln als Stammkunde anlegen.</p>
+
+        <!-- Option A: URL -->
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-bottom:6px;">iCloud-Kalender Link einfügen</label>
+          <div style="display:flex;gap:8px;">
+            <input type="url" id="icsKundenUrl" placeholder="webcal:// oder https://p…icloud.com/published/…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:10px 14px;font-family:var(--sans);font-size:13px;border-radius:2px;outline:none;">
+            <button onclick="parseICSKundenFromUrl()" style="background:var(--gold);color:#0B0B0B;border:none;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;font-family:var(--sans);white-space:nowrap;">Laden</button>
+          </div>
+        </div>
+        <!-- Option B: Datei -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="flex:1;height:1px;background:var(--line);"></div>
+          <span style="font-size:11px;color:var(--fg-mute);letter-spacing:0.1em;text-transform:uppercase;">oder Datei wählen</span>
+          <div style="flex:1;height:1px;background:var(--line);"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+          <input type="file" id="icsKundenFile" accept=".ics" onchange="parseICSKunden()" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:10px 14px;font-family:var(--sans);font-size:13px;border-radius:2px;cursor:pointer;">
+          <button onclick="document.getElementById('icsKundenFile').value='';document.getElementById('icsKundenUrl').value='';document.getElementById('icsKundenPanel').style.display='none';" style="background:none;border:1px solid var(--line);color:var(--fg-dim);padding:10px 14px;font-size:12px;border-radius:2px;cursor:pointer;font-family:var(--sans);white-space:nowrap;">Zurücksetzen</button>
+        </div>
+
+        <div id="icsKundenPanel" style="display:none;">
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;">
+            <div style="position:relative;flex:1;">
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--fg-dim);font-size:15px;">⌕</span>
+              <input type="text" id="icsKundenSearch" placeholder="Name suchen …" oninput="renderICSKunden()" style="width:100%;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:9px 12px 9px 32px;font-family:var(--sans);font-size:13px;border-radius:2px;outline:none;box-sizing:border-box;">
+            </div>
+            <div id="icsKundenCount" style="font-size:12px;color:var(--fg-dim);white-space:nowrap;"></div>
+          </div>
+          <div id="icsKundenList" style="border:1px solid var(--line);border-radius:2px;overflow:hidden;"></div>
+          <div id="icsKundenResult" class="form-result" style="margin-top:12px;"></div>
+        </div>
+
+        <!-- Importierte Stammkunden (Rückgängig) -->
+        <div id="icsImportedKunden" style="margin-top:20px;display:none;">
+          <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:10px;">Importierte Stammkunden (noch ohne E-Mail)</div>
+          <div id="icsImportedKundenList"></div>
+        </div>
+        <button onclick="loadImportedKunden()" style="margin-top:16px;background:none;border:none;color:var(--fg-dim);font-size:12px;cursor:pointer;font-family:var(--sans);text-decoration:underline;padding:0;">Importierte Stammkunden anzeigen / verwalten</button>
+      </div>
+    </div>
+
+    <!-- TAB: Kalender -->
+    <div id="tab-kalender" style="display:none;">
+      <!-- Month calendar -->
+      <div class="card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:0;">Monats<em style="font-style:italic;color:var(--gold)">kalender</em></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button onclick="calPrev()" style="width:32px;height:32px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:50%;cursor:pointer;font-size:16px;">‹</button>
+            <span id="adminCalLbl" style="font-family:var(--serif);font-size:18px;min-width:160px;text-align:center;"></span>
+            <button onclick="calNext()" style="width:32px;height:32px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:50%;cursor:pointer;font-size:16px;">›</button>
+          </div>
+        </div>
+        <div id="adminCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+        <div style="display:flex;gap:16px;margin-top:14px;font-size:11px;color:var(--fg-dim);">
+          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Termine vorhanden</span>
+          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:rgba(139,204,159,0.5);display:inline-block;"></span>Freie Slots</span>
+          <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--fg-mute);display:inline-block;"></span>Geschlossen</span>
+        </div>
+      </div>
+
+      <!-- Day detail -->
+      <div id="dayDetail" style="display:none;">
+        <div class="card" style="margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="card-title" style="margin-bottom:0;" id="dayDetailTitle"></div>
+            <button onclick="document.getElementById('dayDetail').style.display='none'" style="background:none;border:1px solid var(--line);color:var(--fg-dim);padding:6px 12px;font-size:12px;border-radius:2px;cursor:pointer;font-family:var(--sans);">× Schließen</button>
+          </div>
+          <div id="daySlotGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Agenda + Free slots -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card-title">Heute <em style="font-style:italic;color:var(--gold);font-size:16px;" id="todayDateLabel"></em></div>
+          <p class="card-sub" style="margin-bottom:16px;">Alle Termine für heute</p>
+          <div id="todayList"><div class="list-loading">Lade …</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Diese <em style="font-style:italic;color:var(--gold)">Woche</em></div>
+          <p class="card-sub" style="margin-bottom:16px;">Nächste 7 Tage</p>
+          <div id="weekList"><div class="list-loading">Lade …</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Nächste freie <em style="font-style:italic;color:var(--gold)">Termine</em></div>
+        <p class="card-sub" style="margin-bottom:16px;">Erster freier Slot + 5 weitere — automatisch ermittelt</p>
+        <div id="freeSlotsList"><div class="list-loading">Lade …</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: Einstellungen -->
+    <div id="tab-einstellungen" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Working hours -->
+        <div class="card">
+          <div class="card-title">Arbeitszeiten <em style="font-style:italic;color:var(--gold)">Standard</em></div>
+          <p class="card-sub" style="margin-bottom:20px;">Gilt für alle Tage ohne individuelle Einstellung</p>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-bottom:10px;">Arbeitstage</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="dayCheckboxes">
+              <label class="day-cb"><input type="checkbox" value="1"> Mo</label>
+              <label class="day-cb"><input type="checkbox" value="2" checked> Di</label>
+              <label class="day-cb"><input type="checkbox" value="3" checked> Mi</label>
+              <label class="day-cb"><input type="checkbox" value="4" checked> Do</label>
+              <label class="day-cb"><input type="checkbox" value="5" checked> Fr</label>
+              <label class="day-cb"><input type="checkbox" value="6"> Sa</label>
+              <label class="day-cb"><input type="checkbox" value="0"> So</label>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+            <div class="fg" style="margin-bottom:0;">
+              <label>Öffnung</label>
+              <input type="time" id="defStart" value="10:00">
+            </div>
+            <div class="fg" style="margin-bottom:0;">
+              <label>Schließung</label>
+              <input type="time" id="defEnd" value="19:00">
+            </div>
+          </div>
+          <button class="btn-gold" onclick="saveDefaultHours()">Speichern</button>
+          <div class="form-result" id="hoursResult"></div>
+        </div>
+
+        <!-- Date overrides -->
+        <div class="card">
+          <div class="card-title">Individuelle <em style="font-style:italic;color:var(--gold)">Tage</em></div>
+          <p class="card-sub" style="margin-bottom:20px;">Abweichende Zeiten oder Schließung für bestimmte Tage</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+            <div class="fg" style="margin-bottom:0;"><label>Datum</label><input type="date" id="ovDate" style="width:100%;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="fg" style="margin-bottom:0;"><label>Von</label><input type="time" id="ovStart" value="10:00" style="width:100%;"></div>
+              <div class="fg" style="margin-bottom:0;"><label>Bis</label><input type="time" id="ovEnd" value="21:00" style="width:100%;"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button onclick="addOverride(false)" style="flex:1;background:var(--gold);color:#0B0B0B;border:none;padding:10px;font-size:12px;font-weight:600;border-radius:2px;cursor:pointer;font-family:var(--sans);">+ Abweichende Zeit</button>
+            <button onclick="addOverride(true)" style="flex:1;background:var(--surface-2);color:var(--red);border:1px solid rgba(232,136,136,0.3);padding:10px;font-size:12px;font-weight:600;border-radius:2px;cursor:pointer;font-family:var(--sans);">🔒 Tag sperren</button>
+          </div>
+          <div id="overrideResult" style="margin-bottom:8px;"></div>
+          <div id="overrideList"><div class="list-loading" style="font-size:12px;">Lade …</div></div>
+        </div>
+
+        <!-- Pausenzeiten -->
+        <div class="card">
+          <div class="card-title">Pausenzeiten <em style="font-style:italic;color:var(--gold)">Täglich</em></div>
+          <p class="card-sub" style="margin-bottom:20px;">Tägliche Pausen — kein Termin buchbar in dieser Zeit</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div class="fg" style="margin-bottom:0;"><label>Von</label><input type="time" id="breakStart" value="13:00" style="width:100%;"></div>
+            <div class="fg" style="margin-bottom:0;"><label>Bis</label><input type="time" id="breakEnd" value="13:30" style="width:100%;"></div>
+          </div>
+          <div class="fg" style="margin-bottom:12px;">
+            <label>Bezeichnung</label>
+            <input type="text" id="breakLabel" placeholder="z.B. Mittagspause" style="width:100%;">
+          </div>
+          <button class="btn-gold" onclick="addBreak()">+ Pause hinzufügen</button>
+          <div id="breakList" style="margin-top:14px;"><div class="list-loading" style="font-size:12px;">Lade …</div></div>
+        </div>
+
+        <!-- Apple Calendar Import -->
+        <div class="card">
+          <div class="card-title">Apple Kalender <em style="font-style:italic;color:var(--gold)">Import</em></div>
+          <p class="card-sub">ICS-Datei aus Apple Kalender importieren. Alle Termine werden als bestätigte Buchungen (ohne Kundenzuordnung) angelegt.</p>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-bottom:8px;">ICS-Datei wählen</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="file" id="icsFile" accept=".ics" onchange="previewICS()" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:10px 14px;font-family:var(--sans);font-size:13px;border-radius:2px;cursor:pointer;">
+            </div>
+          </div>
+          <div id="icsPreview" style="display:none;">
+            <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:10px;">Vorschau — <span id="icsCount">0</span> Termine gefunden <span id="icsFileName" style="font-style:italic;text-transform:none;letter-spacing:0;"></span></div>
+            <div id="icsPreviewList" style="max-height:240px;overflow-y:auto;border:1px solid var(--line);border-radius:2px;margin-bottom:14px;"></div>
+            <div id="icsNote" style="font-size:12px;color:var(--fg-dim);margin-bottom:14px;padding:10px;background:var(--surface-2);border-radius:2px;border-left:3px solid var(--gold);">
+              ℹ Termintitel aus dem Kalender wird als Service eingetragen. Kundennamen können danach manuell ergänzt werden.
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="cancelICSImport()" style="padding:12px 20px;background:transparent;color:var(--fg-dim);border:1px solid var(--line);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;">Abbrechen</button>
+              <button id="icsImportBtn" onclick="importICS()" style="flex:1;background:var(--gold);color:#0B0B0B;border:none;padding:12px;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;">Alle importieren</button>
+            </div>
+          </div>
+          <div class="form-result" id="icsResult"></div>
+
+          <!-- Importierte Termine löschen -->
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line);">
+            <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:10px;">Importierte Termine verwalten</div>
+            <div id="icsImportedInfo" style="font-size:13px;color:var(--fg-dim);margin-bottom:12px;">Lade …</div>
+            <div id="icsImportedList" style="max-height:240px;overflow-y:auto;border:1px solid var(--line);border-radius:2px;margin-bottom:12px;display:none;"></div>
+            <button id="icsDeleteBtn" onclick="deleteImportedICS()" style="display:none;width:100%;background:transparent;color:var(--red);border:1px solid rgba(232,136,136,0.4);padding:11px;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;border-radius:2px;cursor:pointer;">🗑 Alle importierten Termine löschen</button>
+          </div>
+        </div>
+
+        <!-- Export -->
+        <div class="card">
+          <div class="card-title">Termine <em style="font-style:italic;color:var(--gold)">exportieren</em></div>
+          <p class="card-sub">Nur stattgefundene (bestätigte) Termine. Als CSV-Datei — direkt für das Finanzamt.</p>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-bottom:10px;">Zeitraum</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+              <button class="export-period-btn active" onclick="setExportPeriod('week',this)">Diese Woche</button>
+              <button class="export-period-btn" onclick="setExportPeriod('month',this)">Dieser Monat</button>
+              <button class="export-period-btn" onclick="setExportPeriod('year',this)">Dieses Jahr</button>
+              <button class="export-period-btn" onclick="setExportPeriod('custom',this)">Eigener Zeitraum</button>
+            </div>
+            <div id="exportCustomRange" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+              <div class="fg" style="margin-bottom:0;"><label>Von</label><input type="date" id="exportFrom" style="width:100%;" onchange="updateExportPreview()"></div>
+              <div class="fg" style="margin-bottom:0;"><label>Bis</label><input type="date" id="exportTo" style="width:100%;" onchange="updateExportPreview()"></div>
+            </div>
+          </div>
+          <div id="exportPreviewInfo" style="font-size:13px;color:var(--fg-dim);margin-bottom:16px;padding:12px;background:var(--surface-2);border-radius:2px;min-height:40px;"></div>
+          <button class="btn-gold" onclick="runExport()">⬇ CSV herunterladen</button>
+          <div class="form-result" id="exportResult"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Manual Booking Modal -->
+<div class="overlay" id="manualBookingOverlay" onclick="if(event.target===this)closeManualBooking()">
+  <div class="modal" style="max-width:480px;">
+    <div style="padding:24px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;">
+      <div>
+        <div style="font-family:var(--serif);font-size:22px;letter-spacing:-0.01em;margin-bottom:4px;">Manuelle <em style="font-style:italic;color:var(--gold)">Buchung</em></div>
+        <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--fg-dim);">Telefonbuchung erfassen</div>
+      </div>
+      <button onclick="closeManualBooking()" style="background:none;border:1px solid var(--line);color:var(--fg-dim);width:32px;height:32px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s;">×</button>
+    </div>
+    <div style="padding:20px 28px;overflow-y:auto;flex:1;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="fg"><label>Kundenname</label><input type="text" id="mbName" placeholder="Max Mustermann" autocomplete="off"></div>
+        <div class="fg"><label>Telefonnummer</label><input type="tel" id="mbPhone" placeholder="0160 12345678" autocomplete="off"></div>
+      </div>
+      <div class="fg">
+        <label>Service</label>
+        <select id="mbService" style="width:100%;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:13px 14px;font-family:var(--sans);font-size:15px;outline:none;border-radius:2px;">
+          <option value="Haarschnitt inkl. Waschen|48|45">Haarschnitt inkl. Waschen — 48€</option>
+          <option value="Trockenhaarschnitt|40|30">Trockenhaarschnitt — 40€</option>
+          <option value="Traditionelle Bartrasur|38|40">Traditionelle Bartrasur — 38€</option>
+          <option value="Bartrasur|30|25">Bartrasur — 30€</option>
+          <option value="Augenbrauen zupfen|9|15">Augenbrauen zupfen — 9€</option>
+          <option value="Ohrhaarentfernung|9|10">Ohrhaarentfernung — 9€</option>
+          <option value="Nasenhaarentfernung|9|10">Nasenhaarentfernung — 9€</option>
+          <option value="Gesichtshaarentfernung|9|15">Gesichtshaarentfernung — 9€</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="fg" style="margin-bottom:0;"><label>Datum</label><input type="date" id="mbDate" onchange="checkMbConflict()"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Uhrzeit</label><input type="time" id="mbTime" value="10:00" step="1800" onchange="checkMbConflict()"></div>
+      </div>
+      <div id="mbConflict" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(232,136,136,0.1);border:1px solid rgba(232,136,136,0.3);color:var(--red);font-size:13px;border-radius:2px;"></div>
+      <div class="fg" style="margin-top:12px;margin-bottom:0;">
+        <label>Status</label>
+        <select id="mbStatus" style="width:100%;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:13px 14px;font-family:var(--sans);font-size:15px;outline:none;border-radius:2px;">
+          <option value="confirmed">Direkt bestätigt</option>
+          <option value="pending">Ausstehend</option>
+        </select>
+      </div>
+    </div>
+    <div style="padding:16px 28px 24px;border-top:1px solid var(--line);display:flex;gap:12px;background:var(--bg);flex-shrink:0;">
+      <button onclick="closeManualBooking()" style="padding:14px 20px;background:transparent;color:var(--fg-dim);border:1px solid var(--line);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;border-radius:2px;cursor:pointer;">Abbrechen</button>
+      <button id="mbSaveBtn" onclick="saveManualBooking()" style="flex:1;padding:14px;background:var(--gold);color:#0B0B0B;border:none;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;border-radius:2px;cursor:pointer;">Buchung speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL="https://mvggueegxnrtfametfev.supabase.co";
+const SB_ANON="sb_publishable_xDvfOX2c5cJ3GvwPQb_MfA_ySFiyMu4";
+const SB_SERVICE="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12Z2d1ZWVneG5ydGZhbWV0ZmV2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQyMTE0MywiZXhwIjoyMDkxOTk3MTQzfQ.VlxSAJbWT6ixn912yIB2bFIZ43_IJ4dyBFZYPz7gi6Y";
+
+const { createClient } = supabase;
+const adminDb = createClient(SB_URL, SB_SERVICE, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
+const db = adminDb;
+
+document.addEventListener('DOMContentLoaded', initAdmin);
+
+// ========== MAIN TABS ==========
+function setMainTab(tab, btn){
+  ['buchungen','kunden','kalender','einstellungen'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('.tab-grid').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='kunden'){
+    if(isCacheFresh('users')) renderUsers(allUsers);
+    else loadUsers();
+  }
+  if(tab==='kalender'){
+    if(isCacheFresh('calendar')) renderCalendarFromCache();
+    else loadCalendar();
+  }
+  if(tab==='einstellungen'){loadSettings();updateExportPreview();loadImportedICSCount();}
+}
+
+// ========== CALENDAR ==========
+
+let _calAgendaData=[];
+
+async function loadCalendar(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayStr=localDateStr(today);
+  const in30=new Date(today); in30.setDate(in30.getDate()+30);
+
+  // Run month calendar + 30-day agenda fetch in parallel
+  const [,agendaRes]=await Promise.all([
+    loadAdminCal(),
+    db.from('bookings').select('*')
+      .gte('booking_date',todayStr)
+      .lte('booking_date',localDateStr(in30))
+      .in('status',['pending','confirmed'])
+      .order('booking_date').order('booking_time')
+  ]);
+
+  _calAgendaData=agendaRes.data||[];
+  _cache.calendar=Date.now();
+  renderCalendarFromCache();
+}
+
+function renderCalendarFromCache(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayStr=localDateStr(today);
+  const all=_calAgendaData;
+
+  document.getElementById('todayDateLabel').textContent=today.toLocaleDateString('de-DE',{day:'2-digit',month:'long'});
+
+  // TODAY
+  const todayBks=all.filter(b=>b.booking_date===todayStr);
+  const todayEl=document.getElementById('todayList');
+  todayEl.innerHTML=todayBks.length
+    ? todayBks.map(b=>agendaItem(b)).join('')
+    : `<div class="empty-list" style="padding:20px;">Keine Termine heute</div>`;
+
+  // THIS WEEK
+  const weekEl=document.getElementById('weekList');
+  const in7=new Date(today); in7.setDate(in7.getDate()+7);
+  const weekBks=all.filter(b=>{ const d=parseDate(b.booking_date); return d>=today&&d<=in7; });
+  if(!weekBks.length){
+    weekEl.innerHTML=`<div class="empty-list" style="padding:20px;">Keine Termine diese Woche</div>`;
+  } else {
+    const byDate={};
+    weekBks.forEach(b=>{if(!byDate[b.booking_date])byDate[b.booking_date]=[];byDate[b.booking_date].push(b);});
+    weekEl.innerHTML=Object.entries(byDate).map(([date,bks])=>`
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:500;">
+          ${parseDate(date).toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}
+        </div>
+        ${bks.map(b=>agendaItem(b)).join('')}
+      </div>
+    `).join('');
+  }
+
+  // FREE SLOTS
+  renderFreeSlots(calMonthBookings, today);
+}
+
+function agendaItem(b){
+  const lbl={pending:'Ausstehend',confirmed:'Bestätigt',rejected:'Abgelehnt',cancelled:'Storniert'};
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border:1px solid var(--line);margin-bottom:6px;border-radius:2px;">
+    <div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:2px;">${b.user_name||'Kunde'} — ${b.service}</div>
+      <div style="font-size:12px;color:var(--fg-dim);">${b.booking_time} Uhr · ${b.service_price} €</div>
+    </div>
+    <span class="bk-status st-${b.status}">${lbl[b.status]||b.status}</span>
+  </div>`;
+}
+
+function renderFreeSlots(bookedList, today){
+  const el=document.getElementById('freeSlotsList');
+  const now=new Date();
+  const todayStr=localDateStr(now);
+  const freeSlots=[];
+  const bookedMap={};
+  bookedList.forEach(b=>{
+    if(!bookedMap[b.booking_date]) bookedMap[b.booking_date]=new Set();
+    bookedMap[b.booking_date].add(b.booking_time);
+  });
+
+  let checkDate=new Date(today);
+  let daysChecked=0;
+  while(freeSlots.length<6 && daysChecked<60){
+    const dw=checkDate.getDay();
+    // Only Tue-Fri (2,3,4,5)
+    if(dw>=2&&dw<=5){
+      const ds=localDateStr(checkDate);
+      const booked=bookedMap[ds]||new Set();
+      for(const t of ALL_TIMES_ADM){
+        // skip past times for today
+        if(ds===todayStr){
+          const [h,m]=t.split(':').map(Number);
+          const slotTime=new Date(checkDate); slotTime.setHours(h,m,0,0);
+          if(slotTime<=now) continue;
+        }
+        if(!booked.has(t)){
+          freeSlots.push({date:ds,time:t,dateObj:new Date(checkDate)});
+          if(freeSlots.length>=6) break;
+        }
+      }
+    }
+    checkDate=new Date(checkDate); checkDate.setDate(checkDate.getDate()+1);
+    daysChecked++;
+  }
+
+  if(!freeSlots.length){
+    el.innerHTML=`<div class="empty-list">Keine freien Termine in den nächsten 60 Tagen.</div>`;
+    return;
+  }
+
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+    ${freeSlots.map((s,i)=>`
+      <div style="background:${i===0?'rgba(201,165,90,0.1)':'var(--bg)'};border:1px solid ${i===0?'var(--gold)':'var(--line)'};padding:14px 16px;border-radius:2px;">
+        ${i===0?`<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Nächster freier Termin</div>`:''}
+        <div style="font-family:var(--serif);font-size:18px;color:${i===0?'var(--gold)':'var(--fg)'};">${s.dateObj.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'short'})}</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;">${s.time} Uhr</div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ========== ADMIN MONTH CALENDAR ==========
+const MONTHS_DE=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const ALL_TIMES_ADM=["10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00","18:30"];
+let adminCalYear=new Date().getFullYear(), adminCalMonth=new Date().getMonth();
+let calMonthBookings=[];
+
+function calPrev(){if(adminCalMonth===0){adminCalMonth=11;adminCalYear--;}else adminCalMonth--;renderAdminCal();}
+function calNext(){if(adminCalMonth===11){adminCalMonth=0;adminCalYear++;}else adminCalMonth++;renderAdminCal();}
+
+async function loadAdminCal(){
+  const first=localDateStr(new Date(adminCalYear,adminCalMonth,1));
+  const last=localDateStr(new Date(adminCalYear,adminCalMonth+1,0));
+  const {data}=await db.from('bookings').select('booking_date,booking_time,service,user_name,status,service_price')
+    .gte('booking_date',first).lte('booking_date',last).in('status',['pending','confirmed']);
+  calMonthBookings=data||[];
+  renderAdminCal();
+}
+
+function renderAdminCal(){
+  document.getElementById('adminCalLbl').textContent=MONTHS_DE[adminCalMonth]+' '+adminCalYear;
+  const g=document.getElementById('adminCalGrid'); g.innerHTML='';
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d=>{
+    const h=document.createElement('div');h.className='acal-hd';h.textContent=d;g.appendChild(h);
+  });
+  const first=new Date(adminCalYear,adminCalMonth,1);
+  let sd=first.getDay(); sd=sd===0?6:sd-1;
+  for(let i=0;i<sd;i++){const e=document.createElement('div');e.className='acal-d empty';g.appendChild(e);}
+  const dim=new Date(adminCalYear,adminCalMonth+1,0).getDate();
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(adminCalYear,adminCalMonth,d);
+    const dw=dt.getDay();
+    const ds=localDateStr(dt);
+    const el=document.createElement('div');
+    el.textContent=d;
+    const isClosed=dw===0||dw===1||dw===6;
+    el.className='acal-d '+(isClosed?'closed':'open');
+    if(dt.getTime()===today.getTime()) el.classList.add('today-mark');
+    if(!isClosed){
+      const dayBks=calMonthBookings.filter(b=>b.booking_date===ds);
+      if(dayBks.length){
+        const dots=document.createElement('div');dots.className='acal-dots';
+        const pending=dayBks.filter(b=>b.status==='pending').length;
+        const confirmed=dayBks.filter(b=>b.status==='confirmed').length;
+        if(confirmed){const dot=document.createElement('div');dot.className='acal-dot';dot.style.background='var(--gold)';dots.appendChild(dot);}
+        if(pending){const dot=document.createElement('div');dot.className='acal-dot';dot.style.background='rgba(201,165,90,0.4)';dots.appendChild(dot);}
+        el.appendChild(dots);
+      }
+      el.addEventListener('click',()=>showDayDetail(dt,ds,el));
+    }
+    g.appendChild(el);
+  }
+}
+
+function showDayDetail(dt,ds,clickedEl){
+  document.querySelectorAll('.acal-d').forEach(e=>e.classList.remove('sel'));
+  clickedEl.classList.add('sel');
+  const detail=document.getElementById('dayDetail');
+  detail.style.display='block';
+  const dayBks=calMonthBookings.filter(b=>b.booking_date===ds);
+  document.getElementById('dayDetailTitle').innerHTML=
+    dt.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const g=document.getElementById('daySlotGrid'); g.innerHTML='';
+  // Build booked map with durations
+  const bookedRanges=dayBks.map(b=>({
+    start:timeToMins(b.booking_time),
+    end:timeToMins(b.booking_time)+getSvcDur(b.service||''),
+    info:b
+  }));
+  ALL_TIMES_ADM.forEach(t=>{
+    const slotMin=timeToMins(t);
+    const overlap=bookedRanges.find(r=>slotMin>=r.start&&slotMin<r.end);
+    const el=document.createElement('div');
+    if(overlap){
+      const b=overlap.info;
+      el.className='day-slot booked';
+      el.innerHTML=`<div class="day-slot-time">${t}</div>
+        <div class="day-slot-info">${b.user_name||'Kunde'}</div>
+        <div class="day-slot-info">${b.service} · ${b.service_price}€</div>
+        <span class="bk-status st-${b.status}" style="font-size:9px;padding:3px 8px;">${b.status==='pending'?'Ausstehend':'Bestätigt'}</span>`;
+    } else {
+      el.className='day-slot free';
+      el.innerHTML=`<div class="day-slot-time" style="color:var(--green);">${t}</div>
+        <div class="day-slot-info">Frei</div>`;
+    }
+    g.appendChild(el);
+  });
+  detail.scrollTop=0;
+}
+
+function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function getSvcDur(name){
+  return name.split(',').reduce((tot,p)=>{
+    const k=Object.keys(SVC_DUR).find(x=>p.trim().toLowerCase().includes(x.toLowerCase()));
+    return tot+(k?SVC_DUR[k]:30);
+  },0);
+}
+const SVC_DUR={"Haarschnitt inkl. Waschen":45,"Trockenhaarschnitt":30,"Traditionelle Bartrasur":40,"Bartrasur":25,"Augenbrauen zupfen":15,"Ohrhaarentfernung":10,"Nasenhaarentfernung":10,"Gesichtshaarentfernung":15};
+
+// ========== SETTINGS ==========
+let settings={default_days:[2,3,4,5],default_start:"10:00",default_end:"19:00",overrides:[],blocked_dates:[],breaks:[]};
+
+async function loadSettings(){
+  const {data,error}=await adminDb.from("studio_settings").select("*").eq("id","working_hours").single();
+  if(data&&data.value) settings={...settings,...data.value};
+  // Apply to UI
+  document.querySelectorAll("#dayCheckboxes input").forEach(cb=>{
+    cb.checked=settings.default_days.includes(parseInt(cb.value));
+  });
+  document.getElementById("defStart").value=settings.default_start||"10:00";
+  document.getElementById("defEnd").value=settings.default_end||"19:00";
+  renderOverrides();
+  renderBreaks();
+}
+
+async function saveDefaultHours(){
+  const days=[...document.querySelectorAll("#dayCheckboxes input:checked")].map(cb=>parseInt(cb.value));
+  const start=document.getElementById("defStart").value;
+  const end=document.getElementById("defEnd").value;
+  settings.default_days=days;
+  settings.default_start=start;
+  settings.default_end=end;
+  await saveSettings();
+  showFormResult("hoursResult","success","✓ Arbeitszeiten gespeichert");
+}
+
+async function addOverride(closed){
+  const date=document.getElementById("ovDate").value;
+  if(!date){alert("Bitte Datum wählen");return;}
+  if(closed){
+    // Check for active bookings before blocking the day
+    const {data:active}=await adminDb.from("bookings").select("id").eq("booking_date",date).in("status",["pending","confirmed"]);
+    if(active && active.length>0){
+      showFormResult("overrideResult","error",`⚠️ Bitte erst alle ${active.length} aktiven Termin${active.length===1?"":"e"} an diesem Tag stornieren.`);
+      return;
+    }
+  }
+  // Remove existing override for same date
+  settings.overrides=settings.overrides.filter(o=>o.date!==date);
+  if(closed){
+    settings.overrides.push({date,closed:true});
+  } else {
+    const start=document.getElementById("ovStart").value;
+    const end=document.getElementById("ovEnd").value;
+    settings.overrides.push({date,start,end});
+  }
+  settings.overrides.sort((a,b)=>a.date.localeCompare(b.date));
+  await saveSettings();
+  renderOverrides();
+  document.getElementById("ovDate").value="";
+}
+
+async function removeOverride(date){
+  settings.overrides=settings.overrides.filter(o=>o.date!==date);
+  await saveSettings();
+  renderOverrides();
+}
+
+function renderOverrides(){
+  const el=document.getElementById("overrideList");
+  if(!settings.overrides.length){
+    el.innerHTML=`<div style="font-size:13px;color:var(--fg-dim);padding:12px 0;">Keine individuellen Tage eingestellt</div>`;
+    return;
+  }
+  el.innerHTML=settings.overrides.map(o=>{
+    const d=new Date(o.date+'T12:00:00').toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"short",year:"numeric"});
+    if(o.closed){
+      return `<div class="override-item closed">
+        <span>🔒 ${d} — Geschlossen</span>
+        <button onclick="removeOverride('${o.date}')" style="background:none;border:none;color:var(--fg-mute);cursor:pointer;font-size:16px;">×</button>
+      </div>`;
+    }
+    return `<div class="override-item custom">
+      <span>⏰ ${d} — ${o.start} bis ${o.end}</span>
+      <button onclick="removeOverride('${o.date}')" style="background:none;border:none;color:var(--fg-mute);cursor:pointer;font-size:16px;">×</button>
+    </div>`;
+  }).join("");
+}
+
+async function saveSettings(){
+  await adminDb.from("studio_settings").upsert({id:"working_hours",value:settings,updated_at:new Date().toISOString()});
+}
+
+async function addBreak(){
+  const start=document.getElementById("breakStart").value;
+  const end=document.getElementById("breakEnd").value;
+  const label=document.getElementById("breakLabel").value.trim()||"Pause";
+  if(!start||!end||start>=end){showFormResult("hoursResult","error","Bitte gültige Pausenzeiten eingeben.");return;}
+  if(!settings.breaks) settings.breaks=[];
+  settings.breaks.push({start,end,label});
+  settings.breaks.sort((a,b)=>a.start.localeCompare(b.start));
+  await saveSettings();
+  renderBreaks();
+  document.getElementById("breakLabel").value="";
+}
+
+async function removeBreak(idx){
+  settings.breaks.splice(idx,1);
+  await saveSettings();
+  renderBreaks();
+}
+
+function renderBreaks(){
+  const el=document.getElementById("breakList");
+  if(!el) return;
+  if(!settings.breaks||!settings.breaks.length){
+    el.innerHTML=`<div style="font-size:13px;color:var(--fg-dim);padding:8px 0;">Keine Pausen eingestellt</div>`;
+    return;
+  }
+  el.innerHTML=settings.breaks.map((b,i)=>`
+    <div class="override-item custom">
+      <span>⏸ ${b.label} — ${b.start} bis ${b.end}</span>
+      <button onclick="removeBreak(${i})" style="background:none;border:none;color:var(--fg-mute);cursor:pointer;font-size:16px;line-height:1;">×</button>
+    </div>
+  `).join("");
+}
+
+function showFormResult(id,type,msg){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.className="form-result "+type+" show";
+  el.textContent=msg;
+  setTimeout(()=>el.classList.remove("show"),3000);
+}
+
+// ========== MANUAL BOOKING ==========
+function openManualBooking(){
+  const today=todayLocalStr();
+  document.getElementById("mbDate").value=today;
+  document.getElementById("mbName").value="";
+  document.getElementById("mbPhone").value="";
+  document.getElementById("mbConflict").style.display="none";
+  document.getElementById("manualBookingOverlay").classList.add("open");
+}
+function closeManualBooking(){
+  document.getElementById("manualBookingOverlay").classList.remove("open");
+}
+
+async function checkMbConflict(){
+  const date=document.getElementById("mbDate").value;
+  const time=document.getElementById("mbTime").value.slice(0,5);
+  const conflict=document.getElementById("mbConflict");
+  if(!date||!time){conflict.style.display="none";return;}
+  const {data}=await db.from("bookings").select("booking_time,service,user_name")
+    .eq("booking_date",date).in("status",["pending","confirmed"]);
+  if(!data){conflict.style.display="none";return;}
+  const svcVal=document.getElementById("mbService").value;
+  const dur=parseInt(svcVal.split("|")[2]||30);
+  const newStart=timeToMins(time), newEnd=newStart+dur;
+  const clash=data.find(b=>{
+    const bStart=timeToMins(b.booking_time);
+    const bEnd=bStart+getSvcDur(b.service||"");
+    return newStart<bEnd && newEnd>bStart;
+  });
+  if(clash){
+    conflict.style.display="block";
+    conflict.textContent=`⚠ Konflikt: ${clash.user_name||'Kunde'} hat um ${clash.booking_time} Uhr bereits gebucht.`;
+  } else {
+    conflict.style.display="none";
+  }
+}
+
+async function saveManualBooking(){
+  const name=document.getElementById("mbName").value.trim();
+  const phone=document.getElementById("mbPhone").value.trim();
+  const svcVal=document.getElementById("mbService").value;
+  const date=document.getElementById("mbDate").value;
+  const time=document.getElementById("mbTime").value.slice(0,5);
+  const status=document.getElementById("mbStatus").value;
+  if(!name||!date||!time){showToast("Bitte Name, Datum und Uhrzeit ausfüllen");return;}
+  const [svcName,price]=svcVal.split("|");
+  const btn=document.getElementById("mbSaveBtn");
+  btn.disabled=true; btn.textContent="Speichern …";
+  const {error}=await adminDb.from("bookings").insert({
+    user_id:null, user_name:name+(phone?` (${phone})`:""), user_email:"",
+    service:svcName, service_price:parseInt(price),
+    booking_date:date, booking_time:time, status,
+    notes:"Manuelle Buchung (Telefon)"+(phone?` · ${phone}`:"")
+  });
+  btn.disabled=false; btn.textContent="Buchung speichern";
+  if(error){showToast("Fehler: "+error.message);return;}
+  closeManualBooking();
+  loadBookings();loadStats();
+  showToast("✓ Buchung gespeichert");
+}
+
+function showToast(msg){
+  let t=document.getElementById("adminToast");
+  if(!t){t=document.createElement("div");t.id="adminToast";t.style.cssText="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:12px 20px;font-size:13px;z-index:9999;border-radius:4px;opacity:0;transition:all 0.3s;pointer-events:none;";document.body.appendChild(t);}
+  t.textContent=msg; t.style.opacity="1";
+  setTimeout(()=>t.style.opacity="0",3000);
+}
+
+// ========== ADMIN INIT ==========
+let allUsers=[], bookingTab="pending";
+const _cache={};
+function isCacheFresh(key,ms=120000){ return _cache[key]&&Date.now()-_cache[key]<ms; }
+
+async function initAdmin(){
+  await Promise.all([loadStats(), loadBookings(), loadCancellationNotifications()]);
+  // Preload users + calendar in background for instant tab switching
+  loadUsers();
+  loadCalendar();
+  // Seed snapshot so first poll doesn't fire false toasts
+  const snap=await fetchBookingSnapshot();
+  snap.forEach(b=>{ _lastBookingIds.add(b.id); _lastStatuses[b.id]=b.status; });
+  startRealtime();
+}
+
+async function loadStats(){
+  const today=todayLocalStr();
+  const [usersRes,pendingRes,todayRes]=await Promise.all([
+    adminDb.auth.admin.listUsers({perPage:1000}),
+    db.from("bookings").select("id",{count:"exact"}).in("status",["pending","cancel_attempted"]),
+    db.from("bookings").select("id",{count:"exact"}).eq("booking_date",today).in("status",["pending","confirmed"])
+  ]);
+  document.getElementById("statUsers").textContent=usersRes.data?.users?.length||0;
+  document.getElementById("statPending").textContent=pendingRes.data?.length||0;
+  document.getElementById("statToday").textContent=todayRes.data?.length||0;
+}
+
+// ========== STORNIERUNGSBENACHRICHTIGUNGEN ==========
+const CANCEL_ACK_KEY='so_acked_cancellations';
+
+function getAckedIds(){
+  try{return JSON.parse(localStorage.getItem(CANCEL_ACK_KEY)||'[]');}catch{return [];}
+}
+function saveAckedIds(ids){
+  localStorage.setItem(CANCEL_ACK_KEY,JSON.stringify(ids));
+}
+
+async function loadCancellationNotifications(){
+  const box=document.getElementById('cancelInbox');
+  // Stornierungen der letzten 30 Tage laden
+  const since=new Date(); since.setDate(since.getDate()-30);
+  const sinceStr=localDateStr(since);
+  const {data}=await db.from('bookings')
+    .select('id,user_name,service,booking_date,booking_time')
+    .eq('status','cancelled')
+    .gte('booking_date',sinceStr)
+    .order('booking_date',{ascending:false});
+  if(!data||!data.length){box.style.display='none';return;}
+
+  const acked=getAckedIds();
+  const unread=data.filter(b=>!acked.includes(b.id));
+  if(!unread.length){box.style.display='none';return;}
+
+  box.style.display='block';
+  box.innerHTML=`
+    <div class="cancel-inbox">
+      <div class="cancel-inbox-hd">
+        <div class="cancel-inbox-title">
+          ✕ Stornierungen
+          <span class="cancel-inbox-badge">${unread.length}</span>
+        </div>
+      </div>
+      ${unread.map(b=>`
+        <div class="cancel-item" id="ci-${b.id}">
+          <div class="cancel-item-info">
+            <div class="cancel-item-name">${b.user_name||'Kunde'} — ${b.service}</div>
+            <div class="cancel-item-meta">${fmtDate(b.booking_date)} · ${b.booking_time} Uhr</div>
+          </div>
+          <button class="cancel-ack-btn" onclick="ackCancellation('${b.id}')">✓ OK</button>
+        </div>
+      `).join('')}
+      ${unread.length>1?`<div class="cancel-inbox-foot"><button class="cancel-ack-all" onclick="ackAllCancellations()">Alle als gelesen markieren</button></div>`:''}
+    </div>`;
+}
+
+function ackCancellation(id){
+  const acked=getAckedIds();
+  if(!acked.includes(id)) acked.push(id);
+  saveAckedIds(acked);
+  const item=document.getElementById('ci-'+id);
+  if(item) item.remove();
+  // Wenn keine Items mehr übrig → Box ausblenden
+  const remaining=document.querySelectorAll('.cancel-item');
+  if(!remaining.length) document.getElementById('cancelInbox').style.display='none';
+  // Badge aktualisieren
+  const badge=document.querySelector('.cancel-inbox-badge');
+  if(badge) badge.textContent=remaining.length;
+  // Footer-Button ausblenden wenn nur noch 1 oder 0
+  if(remaining.length<=1){const foot=document.querySelector('.cancel-inbox-foot');if(foot)foot.remove();}
+}
+
+function ackAllCancellations(){
+  const items=[...document.querySelectorAll('.cancel-item')];
+  const acked=getAckedIds();
+  items.forEach(el=>{
+    const id=el.id.replace('ci-','');
+    if(!acked.includes(id)) acked.push(id);
+  });
+  saveAckedIds(acked);
+  document.getElementById('cancelInbox').style.display='none';
+}
+
+async function loadUsers(){
+  if(isCacheFresh('users')){ renderUsers(allUsers); return; }
+  const {data,error}=await adminDb.auth.admin.listUsers({perPage:1000});
+  if(error){document.getElementById("userList").innerHTML=`<div class="empty-list">Fehler beim Laden.</div>`;return;}
+  allUsers=data.users||[];
+  _cache.users=Date.now();
+  renderUsers(allUsers);
+}
+
+function renderUsers(users){
+  const list=document.getElementById("userList");
+  if(!users.length){list.innerHTML=`<div class="empty-list">Noch keine Stammkunden angelegt.</div>`;return;}
+  list.innerHTML=users.map(u=>{
+    const name=u.user_metadata?.full_name||u.email?.split("@")[0]||"Unbekannt";
+    const contact=u.email||"—";
+    const phone=u.user_metadata?.contact_phone||"";
+    const initial=name.charAt(0).toUpperCase();
+    const date=new Date(u.created_at).toLocaleDateString("de-DE",{day:"2-digit",month:"short",year:"numeric"});
+    return `<div class="user-item" id="ui-${u.id}">
+      <div class="user-avatar">${initial}</div>
+      <div class="user-info">
+        <div class="user-name">${name}</div>
+        <div class="user-contact">${contact}${phone?` · <a href="tel:${phone}" style="color:var(--gold);text-decoration:none;">${phone}</a>`:""}</div>
+      </div>
+      <div class="user-date">${date}</div>
+      <button class="user-edit" title="Bearbeiten" onclick="editUser('${u.id}','${name.replace(/'/g,"\\'")}','${contact}','${phone}')">✏️</button>
+      <button class="user-delete" title="Löschen" onclick="deleteUser('${u.id}','${name.replace(/'/g,"\\'")}')">×</button>
+    </div>`;
+  }).join("");
+}
+
+function filterUsers(q){
+  const f=q.toLowerCase();
+  renderUsers(allUsers.filter(u=>{
+    const name=(u.user_metadata?.full_name||"").toLowerCase();
+    const email=(u.email||"").toLowerCase();
+    const phone=(u.phone||"").toLowerCase();
+    return name.includes(f)||email.includes(f)||phone.includes(f);
+  }));
+}
+
+// ========== ADD CUSTOMER ==========
+let newMethod="email";
+
+function setNewMethod(m){
+  newMethod=m;
+  document.getElementById("mtEmail").classList.toggle("active",m==="email");
+  document.getElementById("mtPhone").classList.toggle("active",m==="phone");
+  const inp=document.getElementById("newContact");
+  if(m==="email"){inp.type="email";inp.placeholder="kunde@gmail.com";}
+  else{inp.type="tel";inp.placeholder="0160 12345678";}
+  inp.value="";
+}
+
+async function addCustomer(){
+  const name=document.getElementById("newName").value.trim();
+  const contact=document.getElementById("newContact").value.trim();
+  const btn=document.getElementById("addBtn");
+  showResult("","");
+
+  if(!name||!contact){showResult("error","Bitte Name und E-Mail eingeben.");return;}
+
+  const phone=document.getElementById("newPhone").value.trim();
+
+  btn.disabled=true;btn.textContent="Wird angelegt …";
+
+  const {data,error}=await adminDb.auth.admin.createUser({
+    email:contact,
+    user_metadata:{full_name:name, contact_phone:phone},
+    email_confirm:true
+  });
+
+  btn.disabled=false;btn.textContent="Stammkunde anlegen";
+
+  if(error){showResult("error","Fehler: "+(error.message||"Unbekannter Fehler."));return;}
+
+  showResult("success",`✓ ${name} wurde erfolgreich angelegt!\nLogin per E-Mail Code möglich.`);
+  document.getElementById("newName").value="";
+  document.getElementById("newContact").value="";
+  document.getElementById("newPhone").value="";
+  loadUsers();loadStats();
+}
+
+function showResult(type,msg){
+  const el=document.getElementById("formResult");
+  el.className="form-result "+type+" show";
+  el.textContent=msg;
+  setTimeout(()=>el.classList.remove("show"),6000);
+}
+
+function editUser(id, currentName, currentEmail, currentPhone=''){
+  const el=document.getElementById("ui-"+id);
+  el.innerHTML=`
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+      <input id="edit-name-${id}" value="${currentName}" placeholder="Name" style="background:var(--bg);border:1px solid var(--gold);color:var(--fg);padding:8px 10px;font-family:var(--sans);font-size:14px;border-radius:2px;outline:none;width:100%;">
+      <input id="edit-email-${id}" value="${currentEmail}" placeholder="E-Mail" style="background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:8px 10px;font-family:var(--sans);font-size:14px;border-radius:2px;outline:none;width:100%;">
+      <input id="edit-phone-${id}" value="${currentPhone}" placeholder="Handynummer (optional)" style="background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:8px 10px;font-family:var(--sans);font-size:14px;border-radius:2px;outline:none;width:100%;">
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0;">
+      <button onclick="saveUser('${id}')" style="background:var(--gold);color:#0B0B0B;border:none;padding:8px 14px;font-size:12px;font-weight:600;border-radius:2px;cursor:pointer;font-family:var(--sans);">Speichern</button>
+      <button onclick="loadUsers()" style="background:none;border:1px solid var(--line);color:var(--fg-dim);padding:8px 12px;font-size:12px;border-radius:2px;cursor:pointer;font-family:var(--sans);">Abbruch</button>
+    </div>`;
+}
+
+async function saveUser(id){
+  const name=document.getElementById("edit-name-"+id).value.trim();
+  const email=document.getElementById("edit-email-"+id).value.trim();
+  const phone=document.getElementById("edit-phone-"+id).value.trim();
+  if(!name||!email){showResult("error","Name und E-Mail dürfen nicht leer sein.");return;}
+  const {error}=await adminDb.auth.admin.updateUserById(id,{
+    email,
+    user_metadata:{full_name:name, contact_phone:phone}
+  });
+  if(error){showResult("error","Fehler: "+error.message);return;}
+  showResult("success",`✓ ${name} wurde aktualisiert.`);
+  loadUsers();
+}
+
+async function deleteUser(id,name){
+  if(!confirm(`Stammkunde "${name}" wirklich löschen?\nAlle Buchungen bleiben erhalten.`)) return;
+  const {error}=await adminDb.auth.admin.deleteUser(id);
+  if(error){alert("Fehler beim Löschen.");return;}
+  loadUsers();loadStats();
+}
+
+// ========== BOOKINGS ==========
+async function loadBookings(){
+  const list=document.getElementById("bookingList");
+  list.innerHTML=`<div class="list-loading">Lade …</div>`;
+  let q=db.from("bookings").select("*").order("booking_date",{ascending:true}).order("booking_time",{ascending:true});
+  if(bookingTab==="pending") q=q.in("status",["pending","cancel_attempted"]);
+  else if(bookingTab==="confirmed") q=q.eq("status","confirmed");
+  // "all" = no filter
+  const {data,error}=await q.limit(50);
+  if(error||!data||!data.length){
+    list.innerHTML=`<div class="empty-list">Keine Buchungen.</div>`;return;
+  }
+  const lbl={pending:"Ausstehend",confirmed:"Bestätigt",rejected:"Abgelehnt",cancelled:"Storniert",cancel_attempted:"⚠ Storno versucht",no_show:"⚠ No-Show"};
+  const todayStr=todayLocalStr();
+  list.innerHTML=data.map(b=>{
+    const isPast=b.booking_date<todayStr;
+    let actions="";
+    if(b.status==="pending"){
+      actions=`
+        <button class="bk-btn bk-btn-confirm" onclick="updateBooking('${b.id}','confirmed')">✓ Bestätigen</button>
+        <button class="bk-btn bk-btn-reject" onclick="updateBooking('${b.id}','rejected')">✕ Ablehnen</button>`;
+    } else if(b.status==="cancel_attempted"){
+      actions=`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+        <span class="bk-status st-cancel_attempted">⚠ Storno versucht</span>
+        <button class="bk-btn bk-btn-reject" style="font-size:10px;" onclick="updateBooking('${b.id}','cancelled')">Stornieren bestätigen</button>
+      </div>`;
+    } else if(b.status==="confirmed"){
+      actions=`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+        <span class="bk-status st-confirmed">Bestätigt</span>
+        ${isPast?`<button class="bk-btn bk-btn-reject" style="font-size:10px;" onclick="markNoShow('${b.id}')">No-Show</button>`:""}
+      </div>`;
+    } else if(b.status==="no_show"){
+      actions=`<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+        <span class="bk-status st-no_show">⚠ No-Show</span>
+        <button class="bk-btn bk-btn-confirm" style="font-size:10px;" onclick="updateBooking('${b.id}','cancelled')">Sperre aufheben</button>
+      </div>`;
+    } else {
+      actions=`<span class="bk-status st-${b.status}">${lbl[b.status]||b.status}</span>`;
+    }
+    const unlinkedBadge=(!b.user_id)?`<span style="display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.08em;background:rgba(255,200,80,0.12);color:var(--gold);border:1px solid rgba(255,200,80,0.3);border-radius:2px;padding:1px 6px;margin-left:6px;vertical-align:middle;">Nicht verknüpft</span>`:'';
+    const noteHtml=b.customer_note?`<div style="margin-top:5px;font-size:12px;color:var(--fg-dim);background:rgba(201,165,90,0.06);border-left:2px solid var(--gold);padding:4px 8px;border-radius:0 2px 2px 0;">💬 ${b.customer_note}</div>`:"";
+    return `<div class="booking-item">
+      <div style="flex:1;min-width:0;">
+        <div class="bk-svc">${b.user_name||"Kunde"} — ${b.service}${unlinkedBadge}</div>
+        <div class="bk-meta">${fmtDate(b.booking_date)} · ${b.booking_time} Uhr · ${b.service_price} €</div>
+        ${noteHtml}
+      </div>
+      <div class="bk-actions">${actions}</div>
+    </div>`;
+  }).join("");
+}
+
+function setBookingTab(tab,btn){
+  bookingTab=tab;
+  document.querySelectorAll("#tab-buchungen .tabs .tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  loadBookings();
+}
+
+async function updateBooking(id,status){
+  await db.from("bookings").update({status}).eq("id",id);
+  loadBookings();loadStats();loadCancellationNotifications();
+}
+
+async function markNoShow(id){
+  if(!confirm("Diesen Termin als No-Show markieren? Der Kunde kann danach keine neuen Termine buchen, bis die Sperre aufgehoben wird.")) return;
+  await db.from("bookings").update({status:"no_show"}).eq("id",id);
+  showToast("No-Show gespeichert – Kundenkonto gesperrt.");
+  loadBookings();loadStats();
+}
+
+function parseDate(str){const[y,m,d]=str.split('-').map(Number);return new Date(y,m-1,d);}
+function localDateStr(dt){return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;}
+function todayLocalStr(){return localDateStr(new Date());}
+function fmtDate(d){
+  return parseDate(d).toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"long"});
+}
+
+// ========== REALTIME AUTO-REFRESH ==========
+let _rtChannel=null, _pollInterval=null, _retryTimeout=null;
+// Track last known state so we only fire toasts on actual changes
+let _lastBookingIds=new Set(), _lastStatuses={};
+
+function stopRealtime(){
+  if(_rtChannel){ db.removeChannel(_rtChannel); _rtChannel=null; }
+  if(_pollInterval){ clearInterval(_pollInterval); _pollInterval=null; }
+  if(_retryTimeout){ clearTimeout(_retryTimeout); _retryTimeout=null; }
+}
+
+function startRealtime(){
+  stopRealtime(); // always clean up before subscribing
+
+  _rtChannel=db.channel('admin-bookings-'+Date.now()) // unique name avoids stale channel conflicts
+    .on('postgres_changes',{event:'*',schema:'public',table:'bookings'},handleBookingChange)
+    .subscribe((status,err)=>{
+      const indicator=document.getElementById('rtIndicator');
+      if(status==='SUBSCRIBED'){
+        if(indicator){indicator.title='Live-Updates aktiv';indicator.style.background='var(--green)';}
+      } else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+        if(indicator){indicator.title='Verbindung unterbrochen – Wiederverbinden…';indicator.style.background='var(--red)';}
+        // Auto-retry after 6 s
+        _retryTimeout=setTimeout(startRealtime,6000);
+      }
+    });
+
+  // ── Polling fallback every 30 s (works even if Realtime isn't enabled on the table) ──
+  _pollInterval=setInterval(async()=>{
+    const snap=await fetchBookingSnapshot();
+    diffAndNotify(snap);
+    // Silently refresh UI counts
+    loadStats();
+    loadBookings();
+    if(document.getElementById('tab-kalender')?.style.display!=='none') loadCalendar();
+  },30000);
+}
+
+function handleBookingChange(payload){
+  loadStats();
+  loadBookings();
+  if(document.getElementById('tab-kalender')?.style.display!=='none') loadCalendar();
+  if(payload.eventType==='UPDATE'&&payload.new?.status==='cancel_attempted'){
+    showCancelAlert(
+      payload.new.user_name||'Ein Kunde',
+      payload.new.service||'',
+      payload.new.booking_date||'',
+      payload.new.booking_time||''
+    );
+  }
+  if(payload.eventType==='INSERT'){
+    showToast(`📅 Neue Buchung: ${payload.new.user_name||'Neuer Kunde'} — ${payload.new.service||''}`);
+  }
+}
+
+async function fetchBookingSnapshot(){
+  const {data}=await db.from('bookings').select('id,status,user_name,service,booking_date,booking_time')
+    .in('status',['pending','confirmed','cancel_attempted']).order('created_at',{ascending:false}).limit(100);
+  return data||[];
+}
+
+function diffAndNotify(rows){
+  rows.forEach(b=>{
+    const prev=_lastStatuses[b.id];
+    if(!prev){
+      // Brand-new booking appeared via poll (realtime missed it)
+      if(!_lastBookingIds.has(b.id)){
+        showToast(`📅 Neue Buchung: ${b.user_name||'Neuer Kunde'} — ${b.service||''}`);
+      }
+    } else if(prev!==b.status&&b.status==='cancel_attempted'){
+      showCancelAlert(b.user_name||'Ein Kunde',b.service||'',b.booking_date||'',b.booking_time||'');
+    }
+    _lastStatuses[b.id]=b.status;
+    _lastBookingIds.add(b.id);
+  });
+}
+
+// ========== ICS IMPORT ==========
+let icsEvents=[];
+
+function parseICS(text){
+  const events=[];
+  const blocks=text.split(/BEGIN:VEVENT/i);
+  for(let i=1;i<blocks.length;i++){
+    const block=blocks[i];
+    const get=(key)=>{
+      const m=block.match(new RegExp(key+'(?:;[^:]*)?:([^\r\n]+)','i'));
+      return m?m[1].trim():'';
+    };
+    const dtraw=get('DTSTART');
+    if(!dtraw) continue;
+    let date='',time='10:00';
+    const digits=dtraw.replace(/[^0-9]/g,'');
+    if(digits.length>=8){
+      date=`${digits.slice(0,4)}-${digits.slice(4,6)}-${digits.slice(6,8)}`;
+    }
+    if(dtraw.includes('T')&&digits.length>=12){
+      time=`${digits.slice(8,10)}:${digits.slice(10,12)}`;
+    }
+    const summary=get('SUMMARY').replace(/\\,/g,',').replace(/\\n/g,' ').replace(/\\;/g,';');
+    const uid=get('UID');
+    if(date&&summary) events.push({date,time,summary,uid});
+  }
+  events.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  return events;
+}
+
+function previewICS(){
+  const file=document.getElementById('icsFile').files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const all=parseICS(e.target.result);
+    // Nur zukünftige Termine ab heute importieren
+    const todayS=todayLocalStr();
+    icsEvents=all.filter(ev=>ev.date>=todayS);
+    const skipped=all.length-icsEvents.length;
+    const preview=document.getElementById('icsPreview');
+    const list=document.getElementById('icsPreviewList');
+    document.getElementById('icsFileName').textContent=`· ${file.name}`;
+    document.getElementById('icsCount').textContent=icsEvents.length;
+    if(!icsEvents.length){
+      list.innerHTML=`<div style="padding:16px;font-size:13px;color:var(--fg-dim);">Keine zukünftigen Termine gefunden.${skipped>0?` (${skipped} vergangene übersprungen)`:''} Bitte ICS-Datei prüfen.</div>`;
+    } else {
+      list.innerHTML=icsEvents.map((ev,i)=>`
+        <div class="ics-row">
+          <span class="ics-row-date">${ev.date} · ${ev.time}</span>
+          <span class="ics-row-title">${ev.summary}</span>
+          <button onclick="icsEvents.splice(${i},1);previewICSList()" style="background:none;border:none;color:var(--fg-mute);font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;" title="Entfernen">×</button>
+        </div>`).join('');
+      if(skipped>0) list.innerHTML+=`<div style="padding:8px 14px;font-size:12px;color:var(--fg-dim);">ℹ ${skipped} vergangene Termine wurden nicht berücksichtigt.</div>`;
+    }
+    preview.style.display='block';
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function previewICSList(){
+  document.getElementById('icsCount').textContent=icsEvents.length;
+  const list=document.getElementById('icsPreviewList');
+  list.innerHTML=icsEvents.map((ev,i)=>`
+    <div class="ics-row">
+      <span class="ics-row-date">${ev.date} · ${ev.time}</span>
+      <span class="ics-row-title">${ev.summary}</span>
+      <button onclick="icsEvents.splice(${i},1);previewICSList()" style="background:none;border:none;color:var(--fg-mute);font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;" title="Entfernen">×</button>
+    </div>`).join('');
+}
+
+async function importICS(){
+  if(!icsEvents.length) return;
+  const btn=document.getElementById('icsImportBtn');
+  btn.disabled=true; btn.textContent='Importiere …';
+  const rows=icsEvents.map(ev=>({
+    user_id:null,
+    user_name:'Apple Kalender',
+    user_email:'',
+    service:ev.summary,
+    service_price:0,
+    booking_date:ev.date,
+    booking_time:ev.time,
+    status:'confirmed',
+    notes:'Importiert aus Apple Kalender'
+  }));
+  const {error}=await adminDb.from('bookings').insert(rows);
+  btn.disabled=false; btn.textContent='Alle importieren';
+  if(error){
+    showFormResult('icsResult','error','Fehler: '+error.message);
+  } else {
+    showFormResult('icsResult','success',`✓ ${rows.length} Termine importiert.`);
+    cancelICSImport();
+    loadStats();
+  }
+}
+
+function cancelICSImport(){
+  icsEvents=[];
+  document.getElementById('icsPreview').style.display='none';
+  document.getElementById('icsFile').value='';
+}
+
+async function loadImportedICSCount(){
+  const info=document.getElementById('icsImportedInfo');
+  const btn=document.getElementById('icsDeleteBtn');
+  const listEl=document.getElementById('icsImportedList');
+  if(!info||!btn) return;
+  const {data,error}=await adminDb.from('bookings')
+    .select('id,booking_date,booking_time,service')
+    .eq('notes','Importiert aus Apple Kalender')
+    .order('booking_date',{ascending:true})
+    .order('booking_time',{ascending:true});
+  if(error){
+    info.textContent='Fehler beim Laden.';
+    btn.style.display='none';
+    return;
+  }
+  const count=data?data.length:0;
+  if(count===0){
+    info.textContent='Keine importierten Apple-Kalender-Termine vorhanden.';
+    btn.style.display='none';
+    if(listEl) listEl.style.display='none';
+  } else {
+    info.textContent=`${count} importierte${count===1?'r':''} Termin${count===1?'':''} aus Apple Kalender vorhanden.`;
+    btn.style.display='block';
+    if(listEl){
+      listEl.style.display='block';
+      listEl.innerHTML=data.map(b=>`
+        <div class="ics-row">
+          <span class="ics-row-date">${b.booking_date} · ${b.booking_time}</span>
+          <span class="ics-row-title">${b.service||'—'}</span>
+          <button onclick="deleteImportedBooking('${b.id}')" style="background:none;border:none;color:var(--fg-mute);font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;" title="Löschen">×</button>
+        </div>`).join('');
+    }
+  }
+}
+
+async function deleteImportedBooking(id){
+  const {error}=await adminDb.from('bookings').delete().eq('id',id);
+  if(error){showToast('Fehler: '+error.message);return;}
+  loadImportedICSCount();
+  loadStats();
+  loadBookings();
+}
+
+async function deleteImportedICS(){
+  const {data:existing}=await adminDb.from('bookings')
+    .select('id',{count:'exact'})
+    .eq('notes','Importiert aus Apple Kalender');
+  const count=existing?existing.length:0;
+  if(count===0){
+    showToast('Keine importierten Termine vorhanden.');
+    return;
+  }
+  if(!confirm(`${count} importierte Apple-Kalender-Termine wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) return;
+  const btn=document.getElementById('icsDeleteBtn');
+  btn.disabled=true;
+  btn.textContent='Lösche …';
+  const {error}=await adminDb.from('bookings')
+    .delete()
+    .eq('notes','Importiert aus Apple Kalender');
+  btn.disabled=false;
+  btn.textContent='🗑 Alle importierten Termine löschen';
+  if(error){
+    showToast('Fehler: '+error.message);
+  } else {
+    showToast(`✓ ${count} Termin${count===1?'':''} gelöscht.`);
+    loadImportedICSCount();
+    loadStats();
+    loadBookings();
+  }
+}
+
+// ========== STAMMKUNDEN-IMPORT AUS APPLE KALENDER ==========
+let icsKundenData = {}; // { name: [events] }
+
+function parseICSKunden(){
+  const file = document.getElementById('icsKundenFile').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const all = parseICS(e.target.result); // bestehende Funktion nutzen
+    // Alle Termine (auch vergangene) gruppieren
+    const allEvents = parseICSAll(e.target.result);
+    // Nach Name (summary) gruppieren
+    icsKundenData = {};
+    allEvents.forEach(ev => {
+      const name = ev.summary.trim();
+      if(!name) return;
+      if(!icsKundenData[name]) icsKundenData[name] = [];
+      icsKundenData[name].push(ev);
+    });
+    document.getElementById('icsKundenPanel').style.display = 'block';
+    renderICSKunden();
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseICSAll(text){
+  // Wie parseICS aber ALLE Termine (auch vergangene)
+  const events=[];
+  const blocks=text.split(/BEGIN:VEVENT/i);
+  for(let i=1;i<blocks.length;i++){
+    const block=blocks[i];
+    const get=(key)=>{
+      const m=block.match(new RegExp(key+'(?:;[^:]*)?:([^\r\n]+)','i'));
+      return m?m[1].trim():'';
+    };
+    const dtraw=get('DTSTART');
+    if(!dtraw) continue;
+    let date='',time='10:00';
+    const digits=dtraw.replace(/[^0-9]/g,'');
+    if(digits.length>=8) date=`${digits.slice(0,4)}-${digits.slice(4,6)}-${digits.slice(6,8)}`;
+    if(dtraw.includes('T')&&digits.length>=12) time=`${digits.slice(8,10)}:${digits.slice(10,12)}`;
+    const summary=get('SUMMARY').replace(/\\,/g,',').replace(/\\n/g,' ').replace(/\\;/g,';');
+    if(date&&summary) events.push({date,time,summary});
+  }
+  return events;
+}
+
+function renderICSKunden(){
+  const search = (document.getElementById('icsKundenSearch').value||'').toLowerCase().trim();
+  const names = Object.keys(icsKundenData).filter(n => !search || n.toLowerCase().includes(search));
+  names.sort((a,b) => icsKundenData[b].length - icsKundenData[a].length); // Meiste Termine oben
+
+  const countEl = document.getElementById('icsKundenCount');
+  countEl.textContent = `${names.length} Name${names.length!==1?'n':''}`;
+
+  const list = document.getElementById('icsKundenList');
+  if(!names.length){
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--fg-dim);font-size:13px;">Keine Ergebnisse.</div>`;
+    return;
+  }
+
+  list.innerHTML = names.map(name => {
+    const evs = icsKundenData[name];
+    const future = evs.filter(e => e.date >= todayLocalStr()).length;
+    const total = evs.length;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);transition:background 0.15s;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background=''">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;color:var(--fg);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+        <div style="font-size:11px;color:var(--fg-dim);margin-top:2px;">${total} Termin${total!==1?'e':''} gesamt${future>0?` · ${future} zukünftig`:''}</div>
+      </div>
+      <button onclick="addICSKunde('${name.replace(/'/g,"\\'")}')" style="background:var(--gold);color:#0B0B0B;border:none;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;font-family:var(--sans);white-space:nowrap;flex-shrink:0;">+ Stammkunde</button>
+    </div>`;
+  }).join('');
+}
+
+async function parseICSKundenFromUrl(){
+  const url = document.getElementById('icsKundenUrl').value.trim();
+  if(!url){ showToast('Bitte einen iCloud-Link eingeben.'); return; }
+
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = 'Lädt …';
+
+  try {
+    const res = await fetch('https://mvggueegxnrtfametfev.supabase.co/functions/v1/fetch-ics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+    if(data.error){ showToast('Fehler: ' + data.error); return; }
+
+    const allEvents = parseICSAll(data.ics);
+    icsKundenData = {};
+    allEvents.forEach(ev => {
+      const name = ev.summary.trim();
+      if(!name) return;
+      if(!icsKundenData[name]) icsKundenData[name] = [];
+      icsKundenData[name].push(ev);
+    });
+    document.getElementById('icsKundenPanel').style.display = 'block';
+    renderICSKunden();
+    showToast(`✓ Kalender geladen — ${allEvents.length} Termine gefunden.`);
+  } catch(e) {
+    showToast('Netzwerkfehler: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Laden';
+  }
+}
+
+async function loadImportedKunden(){
+  const section = document.getElementById('icsImportedKunden');
+  const listEl  = document.getElementById('icsImportedKundenList');
+  section.style.display = 'block';
+  listEl.innerHTML = '<div style="color:var(--fg-dim);font-size:13px;padding:8px 0;">Lade …</div>';
+
+  // Importierte Stammkunden = Platzhalter-E-Mail mit @noreply.barbershop-demo.local
+  const {data} = await adminDb.auth.admin.listUsers({perPage:1000});
+  const imported = (data?.users||[]).filter(u => u.email?.endsWith('@noreply.barbershop-demo.local'));
+
+  if(!imported.length){
+    listEl.innerHTML = '<div style="color:var(--fg-dim);font-size:13px;padding:8px 0;">Keine importierten Stammkunden ohne E-Mail gefunden.</div>';
+    return;
+  }
+
+  listEl.innerHTML = imported.map(u => {
+    const name = u.user_metadata?.full_name || u.email;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="flex:1;">
+        <div style="font-size:14px;color:var(--fg);">${name}</div>
+        <div style="font-size:11px;color:var(--fg-dim);margin-top:2px;">Noch keine echte E-Mail hinterlegt</div>
+      </div>
+      <button onclick="deleteImportedKunde('${u.id}','${name.replace(/'/g,"\\'")}')" style="background:transparent;border:1px solid rgba(232,136,136,0.4);color:var(--red);padding:6px 12px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;font-family:var(--sans);white-space:nowrap;">🗑 Rückgängig</button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteImportedKunde(id, name){
+  if(!confirm(`„${name}" und alle importierten Buchungen löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.`)) return;
+
+  // 1. Importierte Buchungen löschen
+  await adminDb.from('bookings')
+    .delete()
+    .eq('user_id', id)
+    .eq('notes', 'Importiert aus Apple Kalender');
+
+  // 2. Auth-User löschen
+  const {error} = await adminDb.auth.admin.deleteUser(id);
+  if(error){ showToast('Fehler: '+error.message); return; }
+
+  showToast(`✓ ${name} und importierte Buchungen gelöscht.`);
+  loadImportedKunden();
+  loadUsers();
+  loadStats();
+}
+
+async function addICSKunde(name){
+  const events = icsKundenData[name];
+  if(!events || !events.length) return;
+
+  // Platzhalter-E-Mail (wird später vom Admin mit echter E-Mail ersetzt)
+  const slug = name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30);
+  const rand = Math.random().toString(36).slice(2,7);
+  const placeholderEmail = `import-${slug}-${rand}@noreply.barbershop-demo.local`;
+
+  const resultEl = document.getElementById('icsKundenResult');
+  resultEl.className = 'form-result show';
+  resultEl.textContent = `Lege ${name} an …`;
+
+  // Auth-User anlegen (ohne E-Mail-Bestätigung, Login erst nach echter E-Mail möglich)
+  const {data, error} = await adminDb.auth.admin.createUser({
+    email: placeholderEmail,
+    user_metadata: { full_name: name },
+    email_confirm: false
+  });
+
+  if(error){
+    resultEl.className = 'form-result error show';
+    resultEl.textContent = `Fehler: ${error.message}`;
+    return;
+  }
+
+  const userId = data.user.id;
+
+  // Zukünftige Termine als bestätigte Buchungen importieren
+  const todayS = todayLocalStr();
+  const futureEvs = events.filter(e => e.date >= todayS);
+  if(futureEvs.length > 0){
+    const rows = futureEvs.map(ev => ({
+      user_id: userId,
+      user_name: name,
+      user_email: placeholderEmail,
+      service: 'Termin (Apple Kalender)',
+      service_price: 0,
+      booking_date: ev.date,
+      booking_time: ev.time,
+      status: 'confirmed',
+      agb_accepted: true,
+      agb_accepted_at: new Date().toISOString(),
+      notes: 'Importiert aus Apple Kalender'
+    }));
+    await adminDb.from('bookings').insert(rows);
+  }
+
+  // Aus der Liste entfernen
+  delete icsKundenData[name];
+  renderICSKunden();
+  loadUsers();
+  loadStats();
+
+  resultEl.className = 'form-result success show';
+  resultEl.textContent = `✓ ${name} angelegt${futureEvs.length>0?` · ${futureEvs.length} Termin${futureEvs.length!==1?'e':''} importiert`:''} · E-Mail bitte nachträglich ergänzen`;
+  setTimeout(() => resultEl.classList.remove('show'), 8000);
+}
+
+// ========== EXPORT ==========
+let exportPeriod='week';
+
+function setExportPeriod(period,btn){
+  exportPeriod=period;
+  document.querySelectorAll('.export-period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const custom=document.getElementById('exportCustomRange');
+  custom.style.display=period==='custom'?'grid':'none';
+  updateExportPreview();
+}
+
+function getExportDateRange(){
+  const now=new Date();
+  let from,to;
+  if(exportPeriod==='week'){
+    const day=now.getDay()||7;
+    from=new Date(now); from.setDate(now.getDate()-day+1);
+    to=new Date(from); to.setDate(from.getDate()+6);
+  } else if(exportPeriod==='month'){
+    from=new Date(now.getFullYear(),now.getMonth(),1);
+    to=new Date(now.getFullYear(),now.getMonth()+1,0);
+  } else if(exportPeriod==='year'){
+    from=new Date(now.getFullYear(),0,1);
+    to=new Date(now.getFullYear(),11,31);
+  } else {
+    const fv=document.getElementById('exportFrom').value;
+    const tv=document.getElementById('exportTo').value;
+    if(!fv||!tv) return null;
+    from=new Date(fv); to=new Date(tv);
+  }
+  return{
+    from:localDateStr(from),
+    to:localDateStr(to)
+  };
+}
+
+async function updateExportPreview(){
+  const range=getExportDateRange();
+  const el=document.getElementById('exportPreviewInfo');
+  if(!range){el.textContent='Bitte Zeitraum wählen.';return;}
+  el.textContent='Lade …';
+  const {data}=await adminDb.from('bookings').select('id,service_price',{count:'exact'})
+    .eq('status','confirmed').gte('booking_date',range.from).lte('booking_date',range.to);
+  if(!data||!data.length){
+    el.textContent=`Keine bestätigten Termine vom ${range.from} bis ${range.to}.`;
+    return;
+  }
+  const total=data.reduce((s,b)=>s+Number(b.service_price||0),0);
+  el.innerHTML=`<strong>${data.length} Termine</strong> vom ${range.from} bis ${range.to} &nbsp;·&nbsp; Umsatz gesamt: <strong>${total} €</strong>`;
+}
+
+async function runExport(){
+  const range=getExportDateRange();
+  if(!range){showFormResult('exportResult','error','Bitte gültigen Zeitraum wählen.');return;}
+  const {data,error}=await adminDb.from('bookings').select('*')
+    .eq('status','confirmed')
+    .gte('booking_date',range.from).lte('booking_date',range.to)
+    .order('booking_date').order('booking_time');
+  if(error||!data){showFormResult('exportResult','error','Fehler beim Laden.');return;}
+  if(!data.length){showFormResult('exportResult','error','Keine Termine in diesem Zeitraum.');return;}
+  const esc=(v)=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const header=['Datum','Uhrzeit','Kunde','Service','Preis (EUR)','Notiz'].map(esc).join(',');
+  const rows=data.map(b=>[b.booking_date,b.booking_time,b.user_name,b.service,b.service_price,b.notes||''].map(esc).join(','));
+  const csv='\uFEFF'+[header,...rows].join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`Barbershop-Demo_${range.from}_bis_${range.to}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showFormResult('exportResult','success',`✓ ${data.length} Termine exportiert.`);
+}
+
+function showCancelAlert(name,svc,date,time){
+  // Show persistent red banner at top
+  let banner=document.getElementById('cancelBanner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='cancelBanner';
+    banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9998;background:#B91C1C;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:14px;box-shadow:0 2px 12px rgba(0,0,0,0.4);';
+    document.body.appendChild(banner);
+  }
+  const dateStr=date?fmtDate(date):'';
+  banner.innerHTML=`
+    <span>⚠️ <strong>Stornierungsversuch:</strong> ${name} versucht Termin <em>${svc}</em> ${dateStr} ${time?'um '+time+' Uhr':''} zu stornieren — innerhalb 24h!</span>
+    <button onclick="this.parentElement.remove();loadBookings();" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 14px;border-radius:2px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;">Zur Buchung →</button>
+  `;
+}
+</script>
+</body>
+</html>

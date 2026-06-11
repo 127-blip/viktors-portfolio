@@ -10,23 +10,24 @@ const translations = {
     // Hero
     hero_intro:  "ich baue dinge,",
     hero_l1:     "die funktionieren.",
-    hero_role:   "Senior Product Manager & AI Builder",
+    hero_role:   "AI Product Leader · Strategie & Automatisierung",
     hero_hook:   "An der Schnittstelle von Tech & Business-Strategie:",
     hero_exec:   "Intelligente, skalierbare Workflows und validierte MVPs – präzise konzipiert, um echten Geschäftswert zu schaffen.",
     hero_b1:     "19+ Jahre Enterprise Product Management & Tech Consulting (u.a. Volkswagen)",
-    hero_b2:     "AI Builder & Automation Architect: Claude API · MCP · n8n Workflows",
+    hero_b2:     "KI & Automatisierung: Claude API · MCP · n8n Workflows",
     hero_b3:     "Gründer & Community Manager der AI Community Niedersachsen",
 
     // About
     about_label: "Über mich",
     about_p1:    "Ich bin Viktor. Mein Fundament basiert auf internationalem Projektmanagement, tiefgehender Datenanalyse und starkem Enterprise-Produktmanagement bei Volkswagen. Heute verbinde ich diese Erfahrung mit hands-on AI: Ich baue keine Folien, ich baue Produkte.",
     about_p2:    "Ich schließe die Lücke zwischen Strategie und Code, indem ich geschäftliche Ziele direkt in Technik übersetze. Mit der Claude API, MCP und n8n entwickle ich Prototypen und Automatisierungen, die sofort Mehrwert stiften.",
-    about_p3:    "Um technologisch immer einen Schritt voraus zu sein, teile ich meine Erkenntnisse regelmäßig als Speaker. In der von mir gegründeten AI Community Braunschweig bringe ich Menschen zusammen, um Wissen zu vermitteln und die Brücke zwischen Theorie und echter Produktion zu schlagen.",
+    about_p3:    "Um technologisch immer einen Schritt voraus zu sein, teile ich meine Erkenntnisse regelmäßig als Speaker. In der von mir gegründeten AI Community Niedersachsen bringe ich Menschen zusammen, um Wissen zu vermitteln und die Brücke zwischen Theorie und echter Produktion zu schlagen.",
 
     // Stats
     stat_l1: "Jahre Erfahrung",
     stat_l2: "ROI gesteigert",
     stat_l3: "Idee zu MVP",
+    stat_sub3: "Prototyping mit Claude Code & n8n",
     stat_l4: "Community Mitglieder",
 
     // Contact
@@ -200,23 +201,24 @@ const translations = {
     // Hero
     hero_intro:  "i build things",
     hero_l1:     "that work.",
-    hero_role:   "Senior Product Manager & AI Builder",
+    hero_role:   "AI Product Leader · Strategy & Automation",
     hero_hook:   "At the intersection of Tech & Business Strategy:",
     hero_exec:   "Intelligent, scalable workflows and validated MVPs – precisely engineered to create real business value.",
     hero_b1:     "19+ years of Enterprise Product Management & Tech Consulting (incl. Volkswagen)",
-    hero_b2:     "AI Builder & Automation Architect: Claude API · MCP · n8n Workflows",
-    hero_b3:     "Founder & Community Manager of AI Community Lower Saxony",
+    hero_b2:     "AI & Automation: Claude API · MCP · n8n Workflows",
+    hero_b3:     "Founder & Community Manager of AI Community Niedersachsen",
 
     // About
     about_label: "About",
     about_p1:    "I'm Viktor. My foundation is built on international project management, deep data analysis and enterprise product management at Volkswagen. Today I combine that experience with hands-on AI: I don't build slide decks, I build products.",
     about_p2:    "I close the gap between strategy and code by translating business goals directly into technology. With the Claude API, MCP and n8n I build prototypes and automations that deliver immediate value.",
-    about_p3:    "To stay ahead technologically, I regularly share my insights as a speaker. In the AI Community Braunschweig, which I founded, I bring people together to share knowledge and bridge the gap between theory and real production.",
+    about_p3:    "To stay ahead technologically, I regularly share my insights as a speaker. In the AI Community Niedersachsen, which I founded, I bring people together to share knowledge and bridge the gap between theory and real production.",
 
     // Stats
     stat_l1: "Years Experience",
     stat_l2: "ROI Increased",
     stat_l3: "Idea to MVP",
+    stat_sub3: "Prototyping with Claude Code & n8n",
     stat_l4: "Community Members",
 
     // Contact
