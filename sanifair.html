@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Cabin Monitor · Viktor Weber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- OG / Social Meta -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Smart Cabin Monitor · Viktor Weber" />
+  <meta property="og:description" content="IoT-Konzept für intelligentes Kabinenmonitoring öffentlicher Sanitäranlagen. Bedarfsbasierte Reinigung statt Zeitplan, bis zu 40% weniger Reinigungseinsätze." />
+  <meta property="og:image"       content="social-preview.png" />
+  <meta property="og:url"         content="https://viktorweber.de/sanifair.html" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Smart Cabin Monitor · Viktor Weber" />
+  <meta name="twitter:description" content="IoT-Konzept für bedarfsbasiertes Kabinenmonitoring. Bis zu 40% weniger Reinigungseinsätze." />
+  <meta name="twitter:image"      content="social-preview.png" />
+  <link rel="icon" type="image/png" href="Design ohne Titel(3).png">
+  <link rel="apple-touch-icon" href="Design ohne Titel(3).png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Detail Nav ── */
+    .detail-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .detail-nav__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .detail-nav__back:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+    .detail-nav__back svg { width: 16px; height: 16px; }
+    .detail-nav__name {
+      font-family: var(--display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 7px 16px;
+    }
+
+    /* ── Hero ── */
+    .ph {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .project-hero {
+      padding: 40px 0 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .project-hero__tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow:
+        0 1px 12px rgba(0,0,0,0.07),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .project-hero__title {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.2vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 16px;
+    }
+    .project-hero__sub {
+      font-size: 18px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    /* ── Phase blocks ── */
+    .phase {
+      padding: 48px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase:last-child { border-bottom: none; }
+
+    .phase__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow:
+        0 1px 12px rgba(0,0,0,0.07),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .phase__word {
+      font-family: var(--display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .phase__word--idea       { color: var(--ink-faint); }
+    .phase__word--mvp        { color: var(--accent); }
+    .phase__word--production { color: #1A7A4A; }
+    .phase__word--repeat     { color: #8B4FA8; }
+
+    .phase__dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .phase__dot--idea        { background: var(--ink-faint); }
+    .phase__dot--mvp         { background: var(--accent); }
+    .phase__dot--production  { background: #1A7A4A; }
+    .phase__dot--learnings   { background: #B5621B; }
+    .phase__dot--repeat      { background: #8B4FA8; }
+
+    .phase__headline {
+      font-family: var(--display);
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .phase__body {
+      font-size: 15px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      max-width: 640px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Idea: problem stat ── */
+    .problem-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFF8E7;
+      border: 1px solid #F0DFA0;
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 32px;
+    }
+    .problem-stat__num {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #B8860B;
+    }
+    .problem-stat__text {
+      font-size: 15px;
+      color: #8B6914;
+      max-width: 240px;
+      line-height: 1.4;
+    }
+
+    .idea-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .idea-card {
+      background: #F2F0EC;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .idea-card__icon { font-size: 22px; margin-bottom: 10px; }
+    .idea-card__title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .idea-card__text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* ── MVP: embedded dashboard ── */
+    .mvp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(27, 95, 168, 0.08);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .mvp-badge__dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .dashboard-frame {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.08);
+      height: 500px;
+      position: relative;
+    }
+    .dashboard-frame iframe {
+      width: calc(100% / 0.72);
+      height: calc(100% / 0.72);
+      transform: scale(0.72);
+      transform-origin: top left;
+      border: none;
+      display: block;
+    }
+
+    /* ── Production: metrics ── */
+    .production-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .prod-card {
+      background: #F0FAF4;
+      border: 1px solid #B8E0C8;
+      border-radius: 14px;
+      padding: 22px 20px;
+    }
+    .prod-card__val {
+      font-family: var(--display);
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #1A7A4A;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .prod-card__label {
+      font-size: 13px;
+      color: #2D6A4A;
+      line-height: 1.4;
+    }
+
+    .roi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .roi-table th {
+      background: #F2F0EC;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .roi-table td {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      color: var(--ink-soft);
+    }
+    .roi-table td:last-child {
+      font-weight: 600;
+      color: var(--ink);
+      text-align: right;
+    }
+    .roi-table tr:last-child td {
+      background: #F0FAF4;
+      color: #1A7A4A;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ── Repeat: scale blocks ── */
+    .scale-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .scale-card {
+      background: #FAF5FF;
+      border: 1px solid #DFC8F0;
+      border-radius: 14px;
+      padding: 22px 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .scale-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(139, 79, 168, 0.1);
+    }
+    .scale-card__icon { font-size: 24px; margin-bottom: 12px; }
+    .scale-card__title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .scale-card__text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+    .scale-card__tag {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #8B4FA8;
+      background: rgba(139, 79, 168, 0.08);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── Phase nav · Liquid Glass Pill ── */
+    .phase-nav__inner {
+      pointer-events: all;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 5px 6px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow:
+        0 2px 24px rgba(0, 0, 0, 0.10),
+        0 1px 0 rgba(255,255,255,0.9) inset,
+        0 -1px 0 rgba(0,0,0,0.04) inset;
+    }
+    .phase-nav__item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .phase-nav__item:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+
+    .phase-nav__item.active--idea {
+      color: var(--ink-soft);
+      background: rgba(0,0,0,0.06);
+      border-color: rgba(0,0,0,0.12);
+    }
+    .phase-nav__item.active--mvp {
+      color: var(--accent);
+      background: rgba(27, 95, 168, 0.10);
+      border-color: rgba(27, 95, 168, 0.25);
+    }
+    .phase-nav__item.active--production {
+      color: #1A7A4A;
+      background: rgba(26, 122, 74, 0.10);
+      border-color: rgba(26, 122, 74, 0.25);
+    }
+    .phase-nav__item.active--repeat {
+      color: #8B4FA8;
+      background: rgba(139, 79, 168, 0.10);
+      border-color: rgba(139, 79, 168, 0.25);
+    }
+
+    .detail-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0 64px;
+      align-items: start;
+    }
+    .detail-full {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 40px;
+      border-top: 1px solid var(--border);
+    }
+    .detail-meta { display: flex; flex-direction: column; gap: 24px; }
+    .detail-meta__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .detail-meta__items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-meta__item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .detail-content {}
+    .detail-content__section { margin-bottom: 32px; }
+    .detail-content__section-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .detail-content__text {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+
+    footer.detail-footer {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 40px 64px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--border);
+    }
+    footer.detail-footer a {
+      color: var(--ink-faint);
+      text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+      .detail-nav { padding-left: 24px; padding-right: 24px; }
+      .ph { padding-left: 24px; padding-right: 24px; }
+      .detail-body { grid-template-columns: 1fr; padding-left: 24px; padding-right: 24px; }
+      .detail-full { padding-left: 24px; padding-right: 24px; }
+      .detail-meta { flex-direction: row; flex-wrap: wrap; gap: 16px; }
+      .idea-grid { grid-template-columns: 1fr; }
+      .production-grid { grid-template-columns: 1fr 1fr; }
+      .scale-grid { grid-template-columns: 1fr; }
+      .dashboard-frame { height: 400px; }
+    }
+    .learnings-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .learnings-list li {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+      padding-left: 20px;
+      position: relative;
+    }
+    .learnings-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #B5621B;
+    }
+    .learnings-list li strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="detail-nav">
+    <div class="nav__pill">
+      <a href="index.html" class="detail-nav__back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+        <span data-i18n="back">Zurück</span>
+      </a>
+      <span class="detail-nav__name">Viktor Weber</span>
+      <button class="lang-toggle" id="langToggle">EN</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="project-hero ph">
+    <p class="project-hero__tag" data-i18n="sf_tag">IoT Konzept · 2026</p>
+    <h1 class="project-hero__title" data-i18n-html="sf_title">Smart Cabin<br>Monitor</h1>
+    <p class="project-hero__sub" data-i18n="sf_sub">
+      Intelligentes Kabinenmonitoring für öffentliche Sanitäranlagen.
+      Bedarfsbasiert statt Zeitplan.
+    </p>
+  </header>
+
+  <div class="detail-body">
+    <aside class="detail-meta">
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_role">Meine Rolle</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item" data-i18n="sf_role1">Produktkonzeption</span>
+          <span class="detail-meta__item" data-i18n="sf_role2">IoT Architektur</span>
+          <span class="detail-meta__item" data-i18n="sf_role3">Interaktiver Prototyp</span>
+        </div>
+      </div>
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_stack">Stack</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">HTML / CSS / React</span>
+          <span class="detail-meta__item">LoRaWAN</span>
+        </div>
+      </div>
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_time">Zeitraum</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">2026</span>
+        </div>
+      </div>
+    </aside>
+    <div class="detail-content">
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="sf_sec1">Beschreibung</p>
+        <p class="detail-content__text" data-i18n="sf_text1">
+          Konzeption und Entwicklung eines voll interaktiven IoT-Prototyps für datengetriebenes Facility Management. Das System bricht starre, zeitplanbasierte Reinigungszyklen auf und ersetzt sie durch eine automatisierte, bedarfsbasierte Steuerung in Echtzeit. Über batterielose LoRaWAN-Sensoren werden Belegungsdaten erfasst, durch eine intelligente Zwei-Sensor-Logik validiert und in einem Management-Dashboard aggregiert. Ein integrierter ROI-Rechner kalkuliert die finanzielle Ersparnis dynamisch auf Basis realer tariflicher Lohnkosten und individueller Reinigungszeiten.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="sf_sec2">Besonderheit</p>
+        <p class="detail-content__text" data-i18n="sf_text2">
+          Die Sensoren arbeiten batterielos. Jeder Sensor verfügt über ein integriertes Solarpanel, das sich über Umgebungslicht auflädt – sowohl durch Kunstlicht in der Anlage als auch durch Tageslicht. Das eliminiert Wartungsaufwand und ermöglicht den Einsatz an hunderten Kabinen ohne zusätzliche Infrastruktur oder Verkabelung.
+        </p>
+      </div>
+    </div>
+  </div><!-- /detail-body -->
+
+  <div class="detail-full">
+
+  <!-- IDEA -->
+  <section class="phase" id="idea">
+    <div class="phase__label">
+      <span class="phase__dot phase__dot--idea"></span>
+      <span class="phase__word phase__word--idea">Idea</span>
+    </div>
+
+    <h2 class="phase__headline" data-i18n-html="sf_idea_headline">Reinigung nach Zeitplan<br>ist teuer und ineffizient.</h2>
+    <p class="phase__body" data-i18n="sf_idea_body">
+      Öffentliche Toiletten werden in festen Intervallen gereinigt, egal ob eine Kabine
+      zehnmal oder keinmal genutzt wurde. Das kostet Personal, Zeit und Geld.
+      Die Idee: Sensoren erkennen wann eine Kabine wirklich Reinigung braucht.
+    </p>
+
+    <div class="problem-stat">
+      <span class="problem-stat__num">40%</span>
+      <span class="problem-stat__text" data-i18n="sf_idea_stat">der Reinigungseinsätze sind bei zeitplanbasierter Steuerung unnötig</span>
+    </div>
+
+    <div class="idea-grid">
+      <div class="idea-card">
+        <div class="idea-card__icon">🚪</div>
+        <div class="idea-card__title" data-i18n="sf_idea_t1">Problem</div>
+        <div class="idea-card__text" data-i18n="sf_idea_c1">Reinigungsintervalle ignorieren tatsächliche Nutzung komplett.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card__icon">📡</div>
+        <div class="idea-card__title" data-i18n="sf_idea_t2">Ansatz</div>
+        <div class="idea-card__text" data-i18n="sf_idea_c2">LoRaWAN-Sensoren an Tür und Riegel, integriertes Solarpanel lädt über Umgebungslicht.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card__icon">📊</div>
+        <div class="idea-card__title" data-i18n="sf_idea_t3">Ziel</div>
+        <div class="idea-card__text" data-i18n="sf_idea_c3">Reinigung nur wenn nötig. Dashboards für Facility Manager in Echtzeit.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MVP -->
+  <section class="phase" id="mvp">
+    <div class="phase__label">
+      <span class="phase__dot phase__dot--mvp"></span>
+      <span class="phase__word phase__word--mvp">MVP</span>
+    </div>
+
+    <h2 class="phase__headline" data-i18n-html="sf_mvp_headline">Interaktives Dashboard,<br>gebaut um zu zeigen wie es funktioniert.</h2>
+    <p class="phase__body" data-i18n="sf_mvp_body">
+      Das Monitoring-Dashboard simuliert eine echte Anlage mit sechs Kabinen,
+      LoRaWAN-Gateway, Sensordaten und Ereignisprotokoll. Vollständig interaktiv,
+      gebaut in reinem HTML, CSS und React.
+    </p>
+
+    <div class="mvp-badge">
+      <span class="mvp-badge__dot"></span>
+      <span data-i18n="sf_mvp_badge">Mockup · interaktiv</span>
+    </div>
+
+    <div class="dashboard-frame" style="height:860px; width:100%;">
+      <iframe
+        src="Smart_Cabin_Monitor_Mockup.html#monitor"
+        title="Smart Cabin Monitor Dashboard"
+        loading="lazy"
+        style="width:calc(100% / 0.68); height:calc(100% / 0.68); transform:scale(0.68); transform-origin:top left; border:none; display:block;"
+      ></iframe>
+    </div>
+  </section>
+
+  <!-- PRODUCTION -->
+  <section class="phase" id="production">
+    <div class="phase__label">
+      <span class="phase__dot phase__dot--production"></span>
+      <span class="phase__word phase__word--production">Production</span>
+    </div>
+
+    <h2 class="phase__headline" data-i18n-html="sf_prod_headline">Was ein echter Rollout<br>kosten und bringen würde.</h2>
+    <p class="phase__body" data-i18n="sf_prod_body">
+      Ein produktiver Einsatz mit 20 Kabinen amortisiert sich bei typischen
+      Reinigungskosten innerhalb von 3 bis 6 Monaten. Die Hardware ist batterielos,
+      wartungsarm und skaliert ohne zusätzliche Infrastruktur.
+    </p>
+
+    <div class="production-grid">
+      <div class="prod-card">
+        <div class="prod-card__val">175€</div>
+        <div class="prod-card__label" data-i18n="sf_prod_label1">Einmalinvestition pro Kabine inkl. Montage</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card__val">3-6</div>
+        <div class="prod-card__label" data-i18n="sf_prod_label2">Monate bis zur Amortisation bei Festivals</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card__val" data-i18n="sf_prod_val3">bis zu 40%</div>
+        <div class="prod-card__label" data-i18n="sf_prod_label3">weniger Reinigungseinsätze</div>
+      </div>
+    </div>
+
+    <div class="dashboard-frame" style="height: 660px;">
+      <iframe
+        src="Smart_Cabin_Monitor_Mockup.html#roi"
+        title="ROI Kalkulator"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </section>
+
+  <!-- LEARNINGS -->
+  <section class="phase" id="learnings">
+    <div class="phase__label">
+      <span class="phase__dot phase__dot--learnings"></span>
+      <span class="phase__word" style="color:#B5621B;">Learnings</span>
+    </div>
+
+    <h2 class="phase__headline" data-i18n="sf_learn_headline">Was dieses Projekt mir gezeigt hat.</h2>
+    <ul class="learnings-list">
+      <li data-i18n-html="sf_learn1"><strong>Rapid Prototyping &amp; Speed-to-Market:</strong> Konzeption des ersten funktionalen MVPs innerhalb von 10 Minuten und Bereitstellung des vollständig interaktiven Prototyps inklusive valider ROI-Logik in unter 60 Minuten mittels moderner AI-Assisted Development Workflows.</li>
+      <li data-i18n-html="sf_learn2"><strong>Zwei-Sensor-Logik (Datenqualität):</strong> Erhöhung der Datenvalidität durch Verknüpfung von Tür- und Riegelkontakt. Ein reines Öffnen der Tür ohne anschließendes Verriegeln wird als bloßer Durchgang erkannt und verhindert teure Fehlalarme.</li>
+    </ul>
+  </section>
+
+  <!-- REPEAT -->
+  <section class="phase" id="repeat">
+    <div class="phase__label">
+      <span class="phase__dot phase__dot--repeat"></span>
+      <span class="phase__word phase__word--repeat">Repeat</span>
+    </div>
+
+    <h2 class="phase__headline" data-i18n-html="sf_repeat_headline">Das Modell funktioniert<br>überall wo Räume genutzt werden.</h2>
+    <p class="phase__body" data-i18n="sf_repeat_body">
+      Was mit Toilettenkabinen funktioniert, skaliert auf jeden Raum der überwacht werden muss.
+      Dasselbe Sensor-Gateway-Dashboard-Modell, andere Domäne.
+    </p>
+
+    <div class="scale-grid">
+      <div class="scale-card">
+        <div class="scale-card__icon">🏨</div>
+        <div class="scale-card__title" data-i18n="sf_scale_t1">Hotellerie</div>
+        <div class="scale-card__text" data-i18n="sf_scale_c1">
+          Zimmerservice nur wenn das Zimmer tatsächlich genutzt wurde.
+          Housekeeping-Routen automatisch optimieren.
+        </div>
+        <span class="scale-card__tag" data-i18n="sf_scale_tag1">Gleiches Modell</span>
+      </div>
+      <div class="scale-card">
+        <div class="scale-card__icon">🏟️</div>
+        <div class="scale-card__title" data-i18n="sf_scale_t2">Messen und Events</div>
+        <div class="scale-card__text" data-i18n="sf_scale_c2">
+          Sanitäranlagen auf Großveranstaltungen bedarfsbasiert steuern.
+          Amortisation in wenigen Wochen bei hohem Durchsatz.
+        </div>
+        <span class="scale-card__tag" data-i18n="sf_scale_tag2">Schnelle ROI</span>
+      </div>
+      <div class="scale-card">
+        <div class="scale-card__icon">🏥</div>
+        <div class="scale-card__title" data-i18n="sf_scale_t3">Krankenhäuser</div>
+        <div class="scale-card__text" data-i18n="sf_scale_c3">
+          Hygieneintervalle dokumentieren, Nachweise automatisch erzeugen.
+          Compliance als Nebenprodukt.
+        </div>
+        <span class="scale-card__tag" data-i18n="sf_scale_tag3">Compliance-Vorteil</span>
+      </div>
+      <div class="scale-card">
+        <div class="scale-card__icon">🏗️</div>
+        <div class="scale-card__title" data-i18n="sf_scale_t4">Facility Management</div>
+        <div class="scale-card__text" data-i18n="sf_scale_c4">
+          Mehrere Standorte, eine Plattform. White-Label für
+          FM-Dienstleister als eigenes Produkt.
+        </div>
+        <span class="scale-card__tag" data-i18n="sf_scale_tag4">White-Label</span>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /detail-full -->
+
+  <footer class="detail-footer-new">
+    <a href="index.html" class="detail-footer-new__back" data-i18n="back_portfolio">← Zurück zum Portfolio</a>
+    <span class="detail-footer-new__copy">© 2026 Viktor Weber</span>
+    <div></div>
+  </footer>
+
+  <script>
+    // Phase nav highlight on scroll
+    const phases = ['idea', 'mvp', 'production', 'repeat'];
+    const phaseEls = phases.map(id => document.getElementById(id));
+    const navItems = document.querySelectorAll('.phase-nav__item');
+
+    function updatePhaseNav() {
+      const scrollY = window.scrollY + 160;
+      let current = 'idea';
+      phaseEls.forEach((el, i) => {
+        if (el && el.offsetTop <= scrollY) current = phases[i];
+      });
+      navItems.forEach(item => {
+        item.className = 'phase-nav__item';
+        if (item.dataset.phase === current) {
+          item.classList.add('active--' + current);
+        }
+      });
+    }
+    window.addEventListener('scroll', updatePhaseNav, { passive: true });
+    updatePhaseNav();
+  </script>
+  <script src="i18n.js"></script>
+</body>
+</html>

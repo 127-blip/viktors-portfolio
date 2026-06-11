@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SaniFair — Intelligentes Kabinenmonitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg:#eef3f4;
+  --surface:#ffffff;
+  --border:#e4ebec;
+  --border-strong:#d3dee0;
+  --ink:#15272c;
+  --ink-soft:#5d7176;
+  --ink-faint:#93a6aa;
+  --accent:#0ca8b8;
+  --accent-ink:#0a8a98;
+  --accent-soft:#e1f5f7;
+  --green:#1f9d6b;  --green-soft:#e6f6ef;
+  --amber:#d99323;  --amber-soft:#fbf1d8;
+  --red:#d9493c;    --red-soft:#fae4e1;
+  --font-sans:'IBM Plex Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; }
+body {
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-sans);
+  font-size:14px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+h2 { margin:0; font-size:15px; font-weight:600; letter-spacing:.01em; }
+.app {
+  max-width:1180px;
+  margin:0 auto;
+  padding:22px 24px 40px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+}
+
+/* ---------- intro banner ---------- */
+.intro {
+  background:var(--ink);
+  color:#fff;
+  border-radius:14px;
+  padding:20px 24px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:20px;
+  align-items:center;
+}
+.intro__left {}
+.intro__label {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:6px;
+}
+.intro__title { font-size:17px; font-weight:700; margin:0 0 6px; line-height:1.3; }
+.intro__desc { font-size:13px; color:#a8bec2; line-height:1.55; margin:0; max-width:680px; }
+.intro__stats {
+  display:flex; flex-direction:column; gap:10px; flex:none;
+  border-left:1px solid rgba(255,255,255,.1); padding-left:24px;
+}
+.intro__stat { text-align:right; }
+.intro__stat-val { font-family:var(--font-mono); font-weight:700; font-size:20px; color:#fff; }
+.intro__stat-lbl { font-size:11px; color:#7a9ea4; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display:flex; align-items:center; gap:20px;
+  padding:14px 18px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+}
+.brand { display:flex; align-items:center; gap:11px; }
+.brand__mark {
+  width:30px; height:30px; border-radius:8px;
+  background:var(--accent);
+  position:relative; flex:none;
+}
+.brand__mark::after {
+  content:""; position:absolute; inset:8px 8px auto 8px; height:3px;
+  background:#fff; border-radius:2px;
+  box-shadow:0 6px 0 #fff;
+}
+.brand__txt { display:flex; flex-direction:column; line-height:1.1; }
+.brand__name { font-weight:700; font-size:16px; letter-spacing:-.01em; }
+.brand__sub { font-size:11px; color:var(--ink-faint); }
+.topbar__summary {
+  display:flex; align-items:center; gap:14px; margin-left:8px;
+  font-size:12.5px; color:var(--ink-soft);
+}
+.sumitem b { color:var(--ink); font-variant-numeric:tabular-nums; }
+.sep { width:1px; height:16px; background:var(--border-strong); }
+
+/* ---------- gateway ---------- */
+.gateway {
+  margin-left:auto;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-template-areas:"top meta" "stats stats" "pk pk";
+  gap:4px 12px;
+  align-items:center;
+  padding:10px 14px;
+  border:1px solid var(--border-strong);
+  border-radius:11px;
+  background:#fbfdfd;
+  min-width:200px;
+  transition:border-color .2s, background .2s;
+}
+.gateway.is-tx { border-color:var(--accent); background:var(--accent-soft); }
+.gateway__top { grid-area:top; display:flex; align-items:center; gap:7px; color:var(--ink); }
+.gateway__icon { color:var(--accent-ink); display:flex; }
+.gateway__waves { display:inline-flex; align-items:flex-end; gap:2px; height:15px; }
+.gateway__waves span { width:3px; border-radius:1px; background:var(--accent); opacity:.45; }
+.gateway__waves span:nth-child(1){ height:6px; }
+.gateway__waves span:nth-child(2){ height:10px; }
+.gateway__waves span:nth-child(3){ height:14px; }
+.gateway.is-tx .gateway__waves span { opacity:1; animation:wave .4s ease; }
+@keyframes wave { 0%{transform:scaleY(.4)} 100%{transform:scaleY(1)} }
+.gateway__meta { grid-area:meta; line-height:1.15; }
+.gateway__name { font-weight:600; font-size:13px; }
+.gateway__sub { font-size:10.5px; color:var(--ink-faint); font-family:var(--font-mono); }
+.gateway__stats { grid-area:stats; display:flex; gap:6px; margin-top:2px; }
+.chip {
+  font-family:var(--font-mono); font-size:10px; font-weight:600;
+  padding:2px 7px; border-radius:5px; letter-spacing:.03em;
+}
+.chip--net { background:var(--ink); color:#fff; }
+.chip--net.is-on { background:var(--green); }
+.chip--ghost { background:var(--accent-soft); color:var(--accent-ink); }
+.gateway__packets {
+  grid-area:pk; display:flex; align-items:baseline; gap:6px;
+  border-top:1px solid var(--border); margin-top:4px; padding-top:5px;
+}
+.gateway__packets .num { font-family:var(--font-mono); font-weight:600; font-size:14px; font-variant-numeric:tabular-nums; animation:pop .35s ease; }
+.gateway__packets .lbl { font-size:10.5px; color:var(--ink-faint); }
+
+/* ---------- top section ---------- */
+.topwrap { padding:18px 20px 16px; }
+.topwrap__head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
+.topwrap__title { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+.topwrap__title h2 { white-space:nowrap; }
+.livedot { width:8px; height:8px; border-radius:50%; background:var(--green); position:relative; flex:none; }
+.livedot::after { content:""; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid var(--green); opacity:.5; animation:ping 1.8s ease-out infinite; }
+@keyframes ping { 0%{transform:scale(.6);opacity:.6} 100%{transform:scale(1.5);opacity:0} }
+.topwrap__hint { font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); }
+.occ-title-badge {
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.08em;
+  background:var(--accent); color:#fff; padding:2px 8px; border-radius:5px;
+  display:inline-flex; align-items:center; gap:4px;
+  animation:pop .3s ease;
+}
+
+.stage {
+  display:grid;
+  grid-template-columns:340px 1fr;
+  gap:26px;
+  align-items:start;
+  padding:14px 6px 6px;
+}
+
+/* ---------- cabin illustration ---------- */
+.cabin {
+  width:300px; justify-self:center;
+  display:flex; flex-direction:column; align-items:center;
+}
+.cabin__roof {
+  width:312px; height:14px;
+  border:2px solid var(--ink); border-bottom:none;
+  border-radius:6px 6px 0 0;
+  background:#f4f8f8;
+}
+.cabin__frame {
+  width:300px; height:372px;
+  border:3px solid var(--ink);
+  position:relative;
+  background:#f0f5f5;
+  perspective:1400px;
+  transition:border-color .4s;
+}
+.cabin__frame.is-occupied { border-color:var(--accent); }
+.cabin__interior {
+  position:absolute; inset:10px;
+  background:repeating-linear-gradient(90deg,#dde6e7 0 2px,#e8eff0 2px 14px);
+  display:flex; align-items:center; justify-content:center;
+}
+.cabin__interior-label {
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.18em;
+  color:var(--ink-faint);
+}
+.cabin__person {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; pointer-events:none;
+  animation:pop .4s ease;
+}
+.cabin__person-icon {
+  width:52px; height:52px; border-radius:50%;
+  background:var(--accent); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.cabin__person-label {
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  letter-spacing:.12em; color:var(--accent-ink);
+  background:var(--accent-soft); padding:3px 10px; border-radius:5px;
+  border:1px solid var(--accent);
+}
+.cabin__timer {
+  font-family:var(--font-mono); font-size:18px; font-weight:700;
+  color:var(--accent-ink); letter-spacing:.04em;
+}
+.door {
+  position:absolute; inset:10px;
+  background:#fcfdfd;
+  border:2px solid var(--ink);
+  transform-origin:left center;
+  transform:rotateY(0deg);
+  transition:transform var(--door-dur,850ms) cubic-bezier(.45,.05,.25,1);
+  transform-style:preserve-3d;
+}
+.door.is-open { transform:rotateY(-64deg); }
+.door__edge { position:absolute; right:0; top:0; bottom:0; width:5px; background:var(--accent); }
+.door__handle {
+  position:absolute; right:12px; top:72%; transform:translateY(-50%);
+  width:7px; height:34px; border-radius:4px; background:var(--ink-soft);
+}
+.door-sensor {
+  position:absolute; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  width:max-content;
+}
+.door-sensor--door   { top:18px; }
+.door-sensor--energy { top:42%; }
+.door-sensor--latch  { top:50%; left:auto; right:18px; transform:none; }
+.door-sensor__icon {
+  width:30px; height:30px; border-radius:8px;
+  background:#fff; border:1.5px solid var(--accent);
+  color:var(--accent-ink);
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.door-sensor--energy .door-sensor__icon { border-color:var(--amber); color:var(--amber); }
+.door-sensor.is-active .door-sensor__icon { background:var(--accent-soft); border-color:var(--accent-ink); }
+.door-sensor__spark {
+  position:absolute; top:-7px; right:-7px;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--amber); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  animation:spark .5s ease infinite alternate;
+}
+@keyframes spark { from{transform:scale(.82);opacity:.7} to{transform:scale(1.08);opacity:1} }
+.door-sensor__tag {
+  display:flex; flex-direction:column; align-items:center; line-height:1;
+  background:#fff; border:1px solid var(--border-strong); border-radius:6px;
+  padding:3px 6px; gap:1px;
+}
+.door-sensor__name { font-family:var(--font-mono); font-size:8.5px; letter-spacing:.1em; color:var(--ink-faint); }
+.door-sensor__val { font-family:var(--font-mono); font-weight:600; font-size:13px; color:var(--ink); font-variant-numeric:tabular-nums; animation:pop .35s ease; }
+.cabin__floor {
+  width:340px; height:10px; margin-top:-2px;
+  border:2px solid var(--ink); border-top:none;
+  border-radius:0 0 7px 7px;
+  background:#e7eeef;
+}
+
+/* ---------- sensor status panel ---------- */
+.sensors { display:flex; flex-direction:column; gap:8px; }
+.sensors__head {
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:2px;
+}
+.srow {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 13px;
+  border:1px solid var(--border); border-radius:11px;
+  background:#fbfdfd;
+}
+.srow__icon {
+  width:36px; height:36px; flex:none; border-radius:9px;
+  background:var(--accent-soft); color:var(--accent-ink);
+  display:flex; align-items:center; justify-content:center;
+}
+.srow:last-child .srow__icon { background:var(--amber-soft); color:var(--amber); }
+.srow__text { flex:1; min-width:0; }
+.srow__title { font-weight:600; font-size:13.5px; }
+.srow__sub { font-size:11.5px; color:var(--ink-faint); }
+.srow__right { display:flex; align-items:center; gap:12px; }
+.srow__value { text-align:right; }
+.srow__num { font-family:var(--font-mono); font-weight:600; font-size:18px; font-variant-numeric:tabular-nums; display:inline-block; animation:pop .35s ease; }
+.srow__unit { display:block; font-size:10px; color:var(--ink-faint); font-family:var(--font-mono); }
+.srow__battery { display:flex; align-items:center; gap:8px; }
+.srow__bpct { font-family:var(--font-mono); font-weight:600; font-size:14px; min-width:34px; text-align:right; }
+.srow__live {
+  font-family:var(--font-mono); font-size:9.5px; font-weight:600; letter-spacing:.06em;
+  padding:3px 6px; border-radius:5px; min-width:34px; text-align:center;
+  background:#eef2f3; color:var(--ink-faint);
+}
+.srow__live.is-tx { background:var(--accent); color:#fff; }
+
+/* battery */
+.battery { display:inline-flex; align-items:center; gap:2px; }
+.battery-body { position:relative; height:14px; border:1.5px solid var(--ink-faint); border-radius:3px; overflow:hidden; background:#fff; }
+.battery-fill { position:absolute; left:0; top:0; bottom:0; transition:width .5s ease; }
+.battery-cap { width:3px; height:7px; background:var(--ink-faint); border-radius:0 2px 2px 0; }
+.battery-bolt { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; animation:spark .5s ease infinite alternate; }
+
+.stage__caption {
+  margin-top:10px; padding-top:10px; border-top:1px solid var(--border);
+  font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
+  display:flex; align-items:center; gap:8px;
+}
+.stage__caption::before { content:"›"; color:var(--accent); font-weight:700; }
+
+/* ---------- controls ---------- */
+.controls {
+  display:flex; align-items:center; gap:22px;
+  padding:14px 18px; flex-wrap:wrap;
+}
+.controls__group { display:flex; align-items:center; gap:10px; }
+.controls__cap { font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono); }
+.controls__divider { width:1px; height:30px; background:var(--border-strong); }
+.btn {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-sans); font-size:13.5px; font-weight:600;
+  padding:9px 16px; border-radius:9px; border:1px solid var(--border-strong);
+  background:#fff; color:var(--ink); cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.btn:hover { border-color:var(--ink-faint); }
+.btn--primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.btn--primary:hover { background:var(--accent-ink); border-color:var(--accent-ink); }
+.btn--latch { background:#fff; border-color:var(--accent); color:var(--accent-ink); }
+.btn--latch:hover { background:var(--accent-soft); }
+.btn--unlatch { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink); }
+.btn--unlatch:hover { background:#c8edf0; }
+.btn.is-disabled, .btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn__door { width:13px; height:13px; border:2px solid currentColor; border-radius:2px; transition:transform .3s; transform-origin:left center; }
+.btn__door.is-open { transform:perspective(40px) rotateY(-55deg); }
+.btn--auto { color:var(--accent-ink); border-color:var(--accent); }
+.btn--auto.is-active { background:var(--accent-ink); border-color:var(--accent-ink); color:#fff; }
+.speedseg { display:inline-flex; border:1px solid var(--border-strong); border-radius:9px; overflow:hidden; }
+.speedseg__btn {
+  font-family:var(--font-mono); font-size:12.5px; font-weight:600;
+  padding:8px 13px; border:none; background:#fff; color:var(--ink-soft); cursor:pointer;
+  border-right:1px solid var(--border); transition:background .15s,color .15s;
+}
+.speedseg__btn:last-child { border-right:none; }
+.speedseg__btn:hover { background:#f3f8f8; }
+.speedseg__btn.is-on { background:var(--accent-soft); color:var(--accent-ink); }
+
+/* ---------- dashboard ---------- */
+.dash { padding:18px 20px 22px; }
+.dash__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.dash__legend { display:flex; gap:16px; font-size:12px; color:var(--ink-soft); }
+.lg { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); }
+.lg i { width:9px; height:9px; border-radius:50%; }
+.lg--ok i { background:var(--green); }
+.lg--occ i { background:var(--accent); }
+.lg--warn i { background:var(--amber); }
+.lg--crit i { background:var(--red); }
+.dash__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.ccard {
+  border:1px solid var(--border); border-radius:12px;
+  padding:15px 16px; background:#fbfdfd;
+  border-left:4px solid var(--border-strong);
+  cursor:pointer;
+  transition:border-color .15s, background .15s, outline .15s;
+  outline:2px solid transparent;
+}
+.ccard:hover { background:#f6fbfb; }
+.ccard.is-selected { outline:2px solid var(--accent); outline-offset:2px; }
+.ccard.is-active-view { background:#f2fafc; }
+.ccard--ok   { border-left-color:var(--green); }
+.ccard--warn { border-left-color:var(--amber); }
+.ccard--crit { border-left-color:var(--red); }
+.ccard--occ  { border-left-color:var(--accent); }
+.ccard--live { background:#fff; }
+.ccard__head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+.ccard__id { display:flex; align-items:center; gap:8px; }
+.ccard__no { font-weight:700; font-size:15px; letter-spacing:-.01em; }
+.ccard__livetag { font-family:var(--font-mono); font-size:9px; font-weight:600; letter-spacing:.08em; background:var(--accent); color:#fff; padding:2px 5px; border-radius:4px; }
+.ccard__status { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; font-family:var(--font-mono); }
+.ccard__status--ok   { color:var(--green); }
+.ccard__status--warn { color:var(--amber); }
+.ccard__status--crit { color:var(--red); }
+.ccard__status--occ  { color:var(--accent-ink); }
+.ccard__dot { width:9px; height:9px; border-radius:50%; background:currentColor; }
+.ccard--crit .ccard__dot { animation:ping2 1.4s ease-in-out infinite; }
+.ccard--occ  .ccard__dot { animation:ping2 2s ease-in-out infinite; }
+@keyframes ping2 { 0%,100%{opacity:1} 50%{opacity:.35} }
+.ccard__metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.metric__value { font-family:var(--font-mono); font-weight:600; font-size:15px; font-variant-numeric:tabular-nums; line-height:1.15; white-space:nowrap; }
+.metric__value--ok { color:var(--green); }
+.metric__value--warn { color:var(--amber); }
+.metric__value--crit { color:var(--red); }
+.metric__value span { display:inline-block; animation:pop .35s ease; }
+.metric__label { font-size:10px; color:var(--ink-faint); margin-top:2px; }
+.ccard__bar { height:5px; border-radius:3px; background:#eaf0f1; margin-top:12px; overflow:hidden; }
+.ccard__barfill { height:100%; border-radius:3px; transition:width .4s; }
+.ccard__barfill--ok { background:var(--green); }
+.ccard__barfill--warn { background:var(--amber); }
+.ccard__barfill--crit { background:var(--red); }
+.ccard__barfill--occ { background:var(--accent); }
+.ccard__reason {
+  margin-top:8px; font-size:11px; color:var(--ink-faint);
+  font-family:var(--font-mono); display:flex; align-items:center; gap:5px;
+}
+.ccard__reason-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+
+/* ---------- cabin detail panel ---------- */
+.detail-panel {
+  border:1px solid var(--border); border-radius:14px;
+  background:var(--surface);
+  overflow:hidden;
+  animation:slidein .2s ease;
+}
+@keyframes slidein { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.detail-panel__head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  background:#f8fbfb;
+}
+.detail-panel__title { display:flex; align-items:center; gap:10px; }
+.detail-panel__no { font-weight:700; font-size:16px; }
+.detail-panel__status { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; font-family:var(--font-mono); }
+.detail-panel__status--ok   { color:var(--green); }
+.detail-panel__status--warn { color:var(--amber); }
+.detail-panel__status--crit { color:var(--red); }
+.detail-panel__status--occ  { color:var(--accent-ink); }
+.detail-panel__close {
+  width:28px; height:28px; border-radius:7px; border:1px solid var(--border-strong);
+  background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:var(--ink-faint); line-height:1;
+  transition:background .15s;
+}
+.detail-panel__close:hover { background:#f0f5f5; }
+.detail-panel__body { display:grid; grid-template-columns:1fr 1fr; }
+.detail-panel__col { padding:16px 18px; }
+.detail-panel__col + .detail-panel__col { border-left:1px solid var(--border); }
+.detail-col__head {
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px;
+}
+.dsrow {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border:1px solid var(--border); border-radius:9px;
+  background:#fbfdfd; margin-bottom:8px;
+}
+.dsrow:last-child { margin-bottom:0; }
+.dsrow__icon {
+  width:30px; height:30px; flex:none; border-radius:8px;
+  background:var(--accent-soft); color:var(--accent-ink);
+  display:flex; align-items:center; justify-content:center;
+}
+.dsrow__icon--energy { background:var(--amber-soft); color:var(--amber); }
+.dsrow__text { flex:1; min-width:0; }
+.dsrow__name { font-weight:600; font-size:12.5px; }
+.dsrow__sub { font-size:11px; color:var(--ink-faint); }
+.dsrow__val { font-family:var(--font-mono); font-weight:600; font-size:13px; font-variant-numeric:tabular-nums; }
+.evlog { display:flex; flex-direction:column; gap:6px; }
+.evlog__item { display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border-radius:8px; background:#f6fafb; }
+.evlog__time { font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); white-space:nowrap; padding-top:1px; }
+.evlog__dot { width:7px; height:7px; border-radius:50%; flex:none; margin-top:4px; }
+.evlog__dot--door  { background:var(--accent); }
+.evlog__dot--latch { background:var(--green); }
+.evlog__dot--pass  { background:var(--amber); }
+.evlog__dot--clean { background:var(--red); }
+.evlog__msg { font-size:12.5px; }
+.detail-panel__cta {
+  padding:12px 18px; border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.detail-panel__reason { font-size:12px; color:var(--ink-soft); font-family:var(--font-mono); }
+.btn--clean { background:#fff; border-color:var(--amber); color:var(--amber); }
+.btn--clean:hover { background:var(--amber-soft); }
+.btn--urgent { background:var(--red-soft); border-color:var(--red); color:var(--red); }
+.btn--urgent:hover { background:#f5c8c4; }
+
+.foot { text-align:center; font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px; }
+
+/* ---------- legend / info panel ---------- */
+.legend { padding:20px 24px; display:flex; flex-direction:column; gap:20px; }
+.legend__title { font-size:13px; font-weight:700; letter-spacing:.01em; margin:0 0 14px; display:flex; align-items:center; gap:8px; }
+.legend__title::before { content:""; width:3px; height:16px; background:var(--accent); border-radius:2px; display:inline-block; }
+.legend__sections { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.lsec__head { font-family:var(--font-mono); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
+.lsec__items { display:flex; flex-direction:column; gap:8px; }
+.litem { display:flex; align-items:flex-start; gap:10px; }
+.litem__dot { width:10px; height:10px; border-radius:50%; flex:none; margin-top:3px; }
+.litem__badge {
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.04em;
+  padding:2px 7px; border-radius:5px; flex:none; white-space:nowrap;
+}
+.litem__badge--green  { background:var(--green-soft);  color:var(--green); }
+.litem__badge--amber  { background:var(--amber-soft);  color:var(--amber); }
+.litem__badge--red    { background:var(--red-soft);    color:var(--red); }
+.litem__badge--teal   { background:var(--accent-soft); color:var(--accent-ink); }
+.litem__text { font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
+.litem__text b { color:var(--ink); font-weight:600; }
+
+/* sensor logic flow */
+.flow { display:flex; align-items:stretch; gap:0; margin-top:4px; }
+.flow__step {
+  flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:0;
+  background:#f8fbfb; position:relative;
+}
+.flow__step:first-child { border-radius:10px 0 0 10px; }
+.flow__step:last-child  { border-radius:0 10px 10px 0; }
+.flow__step + .flow__step { border-left:none; }
+.flow__step--result-ok   { background:var(--green-soft);  border-color:var(--green); }
+.flow__step--result-warn { background:var(--amber-soft);  border-color:var(--amber); }
+.flow__num { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--ink-faint); margin-bottom:3px; }
+.flow__label { font-size:12px; font-weight:600; color:var(--ink); }
+.flow__sub { font-size:11px; color:var(--ink-faint); margin-top:1px; }
+.flow__arrow {
+  width:20px; flex:none; display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:var(--ink-faint); background:transparent; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+
+@media (max-width:820px) {
+  .legend__sections { grid-template-columns:1fr; }
+  .flow { flex-direction:column; }
+  .flow__step:first-child { border-radius:10px 10px 0 0; }
+  .flow__step:last-child  { border-radius:0 0 10px 10px; }
+  .flow__step + .flow__step { border-left:1px solid var(--border); border-top:none; }
+  .flow__arrow { width:100%; height:20px; border-top:none; border-bottom:none; border-left:1px solid var(--border); border-right:1px solid var(--border); }
+}
+
+/* ---------- hardware panel ---------- */
+.hw { padding:20px 24px; }
+.hw__sections { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px; }
+.hw__devices { display:flex; flex-direction:column; gap:10px; }
+.hcard {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:13px 14px; border:1px solid var(--border); border-radius:12px;
+  background:#fbfdfd;
+}
+.hcard__img {
+  width:42px; height:42px; flex:none; border-radius:10px;
+  border:1px solid var(--border-strong);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; background:#fff;
+}
+.hcard__body { flex:1; min-width:0; }
+.hcard__name { font-weight:700; font-size:13.5px; margin-bottom:1px; }
+.hcard__model { font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); margin-bottom:6px; }
+.hcard__desc { font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+.hcard__tags { display:flex; gap:5px; flex-wrap:wrap; margin-top:7px; }
+.htag {
+  font-family:var(--font-mono); font-size:10px; font-weight:600;
+  padding:2px 7px; border-radius:5px; letter-spacing:.03em;
+}
+.htag--teal   { background:var(--accent-soft);  color:var(--accent-ink); }
+.htag--amber  { background:var(--amber-soft);   color:var(--amber); }
+.htag--green  { background:var(--green-soft);   color:var(--green); }
+.htag--ink    { background:#eef2f3; color:var(--ink-soft); }
+
+/* comparison table */
+.cmp { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.cmp__head {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  background:#f4f8f9; border-bottom:1px solid var(--border);
+}
+.cmp__col-head {
+  padding:9px 14px; font-size:11.5px; font-weight:700;
+  font-family:var(--font-mono); letter-spacing:.04em; color:var(--ink-soft);
+}
+.cmp__col-head:nth-child(2) { background:var(--accent-soft); color:var(--accent-ink); border-left:1px solid var(--border); border-right:1px solid var(--border); }
+.cmp__col-head:nth-child(3) { color:var(--ink-faint); }
+.cmp__row {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  border-bottom:1px solid var(--border);
+}
+.cmp__row:last-child { border-bottom:none; }
+.cmp__cell { padding:9px 14px; font-size:12.5px; color:var(--ink-soft); }
+.cmp__cell:nth-child(1) { font-weight:600; color:var(--ink); font-size:12px; }
+.cmp__cell:nth-child(2) { background:#fafefe; border-left:1px solid var(--border); border-right:1px solid var(--border); color:var(--ink); }
+.cmp__ok  { color:var(--green); font-weight:700; }
+.cmp__bad { color:var(--red);   font-weight:700; }
+.cmp__mid { color:var(--amber); font-weight:700; }
+
+@media (max-width:820px) {
+  .hw__sections { grid-template-columns:1fr; }
+}
+
+@keyframes pop { 0%{transform:scale(1.35)} 100%{transform:scale(1)} }
+
+@media (max-width:820px) {
+  .stage { grid-template-columns:1fr; }
+  .dash__grid { grid-template-columns:repeat(2,1fr); }
+  .topbar { flex-wrap:wrap; }
+  .gateway { margin-left:0; }
+  .detail-panel__body { grid-template-columns:1fr; }
+  .detail-panel__col + .detail-panel__col { border-left:none; border-top:1px solid var(--border); }
+  .intro { grid-template-columns:1fr; }
+  .intro__stats { border-left:none; padding-left:0; border-top:1px solid rgba(255,255,255,.1); padding-top:14px; flex-direction:row; }
+  .ccard__metrics { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ── Icons ── */
+function IconDoorSensor({ size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="6" y="14" width="12" height="6" rx="1.5"/><line x1="12" y1="10" x2="12" y2="14"/>
+  </svg>;
+}
+function IconLatch({ size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5" y="10" width="14" height="9" rx="1.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/><circle cx="12" cy="14.5" r="1.2" fill="currentColor" stroke="none"/>
+  </svg>;
+}
+function IconSolar({ size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="6" width="16" height="11" rx="1"/>
+    <line x1="4" y1="10.5" x2="20" y2="10.5"/><line x1="4" y1="13.5" x2="20" y2="13.5"/>
+    <line x1="9.3" y1="6" x2="9.3" y2="17"/><line x1="14.6" y1="6" x2="14.6" y2="17"/>
+  </svg>;
+}
+function IconBolt({ size = 16 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="13,2 4,14 11,14 10,22 20,9 13,9"/></svg>;
+}
+function IconGateway({ size = 22 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="14" width="18" height="6" rx="1.5"/>
+    <circle cx="7" cy="17" r="0.9" fill="currentColor" stroke="none"/>
+    <line x1="16" y1="14" x2="16" y2="8"/>
+    <path d="M13.5 8.5a3.5 3.5 0 0 1 5 0"/><path d="M11.8 6.8a6 6 0 0 1 8.4 0"/>
+  </svg>;
+}
+function IconPlay({ size = 16 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="7,5 19,12 7,19"/></svg>;
+}
+function IconPause({ size = 16 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>
+  </svg>;
+}
+function IconPerson({ size = 28 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <circle cx="12" cy="7" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+  </svg>;
+}
+function IconLock({ size = 14 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5" y="10" width="14" height="9" rx="1.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/>
+  </svg>;
+}
+function IconWarning({ size = 14 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M12 2L1 21h22L12 2zm0 4l7.5 13h-15L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+  </svg>;
+}
+
+function BatteryBar({ level = 0, charging = false, width = 46 }) {
+  const pct = Math.max(0, Math.min(100, level));
+  let color = "var(--green)";
+  if (pct < 20) color = "var(--red)";
+  else if (pct < 50) color = "var(--amber)";
+  return (
+    <span className="battery" style={{ width: width + "px" }}>
+      <span className="battery-body" style={{ width: width - 5 + "px" }}>
+        <span className="battery-fill" style={{ width: pct + "%", background: color }}></span>
+        {charging && <span className="battery-bolt"><IconBolt size={11} /></span>}
+      </span>
+      <span className="battery-cap"></span>
+    </span>
+  );
+}
+
+function fmtDuration(seconds) {
+  if (seconds < 60) return seconds + " Sek.";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m + " Min. " + (s > 0 ? s + " Sek." : "");
+}
+
+/* ── Gateway ── */
+function Gateway({ packets, online, tx }) {
+  return (
+    <div className={"gateway" + (tx ? " is-tx" : "")}>
+      <div className="gateway__top">
+        <span className="gateway__icon"><IconGateway size={22} /></span>
+        <span className="gateway__waves" aria-hidden="true"><span></span><span></span><span></span></span>
+      </div>
+      <div className="gateway__meta">
+        <div className="gateway__name">Dragino DLOS8N</div>
+        <div className="gateway__sub">Outdoor-Gateway · 4G LoRaWAN</div>
+      </div>
+      <div className="gateway__stats">
+        <span className={"chip chip--net" + (online ? " is-on" : "")}>4G</span>
+        <span className="chip chip--ghost">LoRaWAN</span>
+      </div>
+      <div className="gateway__packets">
+        <span className="num" key={packets}>{packets.toLocaleString("de-DE")}</span>
+        <span className="lbl">Datenpakete heute</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Cabin view ── */
+function SensorDot({ kind, label, count, charging, battery, active }) {
+  const Icon = kind === "door" ? IconDoorSensor : kind === "latch" ? IconLatch : IconSolar;
+  return (
+    <div className={"door-sensor door-sensor--" + kind + (active ? " is-active" : "")}>
+      <span className="door-sensor__icon">
+        <Icon size={17} />
+        {kind === "energy" && charging && <span className="door-sensor__spark"><IconBolt size={10} /></span>}
+      </span>
+      <span className="door-sensor__tag">
+        <span className="door-sensor__name">{label}</span>
+        {kind === "energy"
+          ? <span className="door-sensor__val">{Math.round(battery)}%</span>
+          : <span className="door-sensor__val" key={count}>{count}</span>}
+      </span>
+    </div>
+  );
+}
+
+function SensorRow({ kind, title, sub, value, unit, charging, battery, lastEvent }) {
+  const Icon = kind === "door" ? IconDoorSensor : kind === "latch" ? IconLatch : IconSolar;
+  return (
+    <div className="srow">
+      <span className="srow__icon"><Icon size={18} /></span>
+      <div className="srow__text">
+        <div className="srow__title">{title}</div>
+        <div className="srow__sub">{sub}</div>
+      </div>
+      <div className="srow__right">
+        {kind === "energy" ? (
+          <div className="srow__battery">
+            <BatteryBar level={battery} charging={charging} />
+            <span className="srow__bpct">{Math.round(battery)}%</span>
+          </div>
+        ) : (
+          <div className="srow__value">
+            <span className="srow__num" key={value}>{value}</span>
+            <span className="srow__unit">{unit}</span>
+          </div>
+        )}
+        <span className={"srow__live" + (charging || lastEvent ? " is-tx" : "")}>
+          {charging || lastEvent ? "TX" : "IDLE"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function CabinView({ cabinNo, isLive, doorOpen, latched, occupied, doorOpens, latchEngages, passThrus,
+                     battery, charging, lastSensor, doorDur, occupancyTimer, avgDuration }) {
+  return (
+    <section className="panel topwrap">
+      <div className="topwrap__head">
+        <div className="topwrap__title">
+          {isLive
+            ? <span className="livedot"></span>
+            : <span style={{width:8,height:8,borderRadius:"50%",background:"var(--ink-faint)",display:"inline-block",flexShrink:0}}></span>
+          }
+          <h2>Kabine {cabinNo} — {isLive ? "Live-Ansicht" : "Letzte bekannte Daten"}</h2>
+          {occupied && (
+            <span className="occ-title-badge">
+              <IconLock size={11} /> BESETZT · {fmtDuration(occupancyTimer)}
+            </span>
+          )}
+          {!isLive && (
+            <span style={{fontFamily:"var(--font-mono)",fontSize:10,padding:"2px 8px",borderRadius:5,background:"#eef2f3",color:"var(--ink-faint)"}}>
+              HISTORISCH
+            </span>
+          )}
+        </div>
+        <div className="topwrap__hint">Frontansicht · Sensoren an der Tür montiert</div>
+      </div>
+
+      <div className="stage">
+        <div className="cabin">
+          <div className="cabin__roof"></div>
+          <div className={"cabin__frame" + (occupied ? " is-occupied" : "")}>
+            <div className="cabin__interior">
+              <span className="cabin__interior-label">INNENRAUM</span>
+            </div>
+            {occupied && (
+              <div className="cabin__person">
+                <div className="cabin__person-icon"><IconPerson size={28} /></div>
+                <div className="cabin__timer">{fmtDuration(occupancyTimer)}</div>
+                <div className="cabin__person-label">BESETZT</div>
+              </div>
+            )}
+            <div className={"door" + (doorOpen ? " is-open" : "")} style={{ "--door-dur": doorDur + "ms" }}>
+              <div className="door__edge"></div>
+              <div className="door__handle"></div>
+              <SensorDot kind="door" label="TÜR" count={doorOpens} active={lastSensor === "door"} />
+              <SensorDot kind="energy" label="SOLAR" battery={battery} charging={charging} />
+              <SensorDot kind="latch" label="RIEGEL" count={latchEngages} active={lastSensor === "latch"} />
+            </div>
+          </div>
+          <div className="cabin__floor"></div>
+        </div>
+
+        <div className="sensors">
+          <div className="sensors__head">Sensoren an dieser Tür</div>
+          <SensorRow kind="door"
+            title="EnOcean-LoRaWAN-Sensor"
+            sub="Türsensor · batterielos · erkennt Öffnen und Schließen"
+            value={doorOpens} unit="Öffnungen"
+            lastEvent={lastSensor === "door"} />
+          <SensorRow kind="latch"
+            title="EnOcean-LoRaWAN-Sensor"
+            sub={"Riegelsensor · batterielos · Belegungserkennung · " + passThrus + " Durchgänge ohne Riegel"}
+            value={latchEngages} unit="Verriegelungen"
+            lastEvent={lastSensor === "latch"} />
+          <SensorRow kind="energy"
+            title="Energy Harvesting"
+            sub="Integriertes Solarpanel · lädt über Umgebungslicht · kein Akku nötig"
+            charging={charging} battery={battery} />
+          {avgDuration > 0 && (
+            <div style={{
+              padding:"10px 13px", border:"1px solid var(--border)", borderRadius:11,
+              background:"var(--accent-soft)", display:"flex", alignItems:"center",
+              gap:10, fontFamily:"var(--font-mono)", fontSize:12
+            }}>
+              <span style={{ color:"var(--accent-ink)", fontWeight:700, fontSize:15 }}>⌀ {fmtDuration(avgDuration)}</span>
+              <span style={{ color:"var(--ink-soft)" }}>Durchschnittliche Verweildauer heute</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="stage__caption">
+        <span>
+          {occupied
+            ? "Riegel eingerastet von innen — Kabine als besetzt erkannt, Uplink gesendet"
+            : doorOpen
+            ? "Tür offen — Magnetkontakt unterbrochen, Uplink gesendet"
+            : "Tür geschlossen — warte auf Riegelsignal zur Belegungsbestätigung"}
+        </span>
+      </div>
+    </section>
+  );
+}
+
+/* ── Dashboard ── */
+const STATUS = {
+  green:    { label: "Frei & sauber",        cls: "ok" },
+  yellow:   { label: "Aufmerksamkeit nötig", cls: "warn" },
+  red:      { label: "Reinigung erforderlich", cls: "crit" },
+  occupied: { label: "Besetzt",              cls: "occ" },
+};
+
+const CABIN_DETAILS = {
+  "02": {
+    doorOpens: 47, latches: 44, passThrus: 3, battery: 68, avgDuration: 198,
+    reason: "3 Durchgänge ohne Verriegelung erkannt",
+    events: [
+      { time: "14:31", kind: "door",  msg: "Tür geöffnet" },
+      { time: "14:31", kind: "latch", msg: "Riegel eingerastet — Besetzt (3 Min. 18 Sek.)" },
+      { time: "14:39", kind: "pass",  msg: "Tür auf/zu ohne Riegel — möglicher Durchgang" },
+      { time: "14:47", kind: "latch", msg: "Riegel eingerastet — Besetzt (2 Min. 05 Sek.)" },
+    ],
+  },
+  "03": {
+    doorOpens: 63, latches: 55, passThrus: 8, battery: 41, avgDuration: 312,
+    reason: "8 Durchgänge ohne Verriegelung + letzte Reinigung vor 5h 40m",
+    events: [
+      { time: "08:47", kind: "clean", msg: "Letzte Reinigung abgeschlossen" },
+      { time: "09:02", kind: "latch", msg: "Riegel eingerastet — Besetzt (5 Min. 12 Sek.)" },
+      { time: "10:14", kind: "pass",  msg: "Tür auf/zu ohne Riegel — kein Riegel erkannt" },
+      { time: "14:23", kind: "pass",  msg: "Tür auf/zu ohne Riegel — kein Riegel erkannt" },
+    ],
+  },
+  "04": {
+    doorOpens: 31, latches: 31, passThrus: 0, battery: 89, avgDuration: 145,
+    reason: "Alle Öffnungen mit Verriegelung — normale Nutzung",
+    events: [
+      { time: "13:55", kind: "door",  msg: "Tür geöffnet" },
+      { time: "13:55", kind: "latch", msg: "Riegel eingerastet — Besetzt (2 Min. 25 Sek.)" },
+      { time: "14:02", kind: "latch", msg: "Riegel eingerastet — Besetzt (1 Min. 58 Sek.)" },
+      { time: "14:28", kind: "latch", msg: "Riegel eingerastet — Besetzt (2 Min. 10 Sek.)" },
+    ],
+  },
+  "05": {
+    doorOpens: 52, latches: 49, passThrus: 3, battery: 55, avgDuration: 227,
+    reason: "3 Durchgänge ohne Verriegelung + letzte Reinigung vor 3h 05m",
+    events: [
+      { time: "13:10", kind: "clean", msg: "Reinigung angefordert" },
+      { time: "14:05", kind: "pass",  msg: "Tür auf/zu ohne Riegel — kein Riegel erkannt" },
+      { time: "14:18", kind: "latch", msg: "Riegel eingerastet — Besetzt (3 Min. 44 Sek.)" },
+      { time: "14:31", kind: "pass",  msg: "Tür auf/zu ohne Riegel — kein Riegel erkannt" },
+    ],
+  },
+  "06": {
+    doorOpens: 19, latches: 18, passThrus: 1, battery: 92, avgDuration: 178,
+    reason: "Geringer Betrieb, letzte Reinigung vor 1h 12m",
+    events: [
+      { time: "12:40", kind: "clean", msg: "Reinigung abgeschlossen" },
+      { time: "13:15", kind: "latch", msg: "Riegel eingerastet — Besetzt (1 Min. 58 Sek.)" },
+      { time: "14:02", kind: "latch", msg: "Riegel eingerastet — Besetzt (3 Min. 11 Sek.)" },
+      { time: "14:29", kind: "latch", msg: "Riegel eingerastet — Besetzt (2 Min. 26 Sek.)" },
+    ],
+  },
+};
+
+function CabinCard({ cabin, selected, active, onSelect, onClean }) {
+  const st = STATUS[cabin.status];
+  const rejAccent = cabin.rejection >= 20 ? "crit" : cabin.rejection >= 10 ? "warn" : "ok";
+  return (
+    <div className={"ccard ccard--" + st.cls + (cabin.live ? " ccard--live" : "") + (selected ? " is-selected" : "") + (active && !selected ? " is-active-view" : "")}
+      onClick={() => onSelect(cabin.no)}>
+      <div className="ccard__head">
+        <div className="ccard__id">
+          <span className="ccard__no">Kabine {cabin.no}</span>
+          {cabin.live && <span className="ccard__livetag">LIVE</span>}
+        </div>
+        <div className={"ccard__status ccard__status--" + st.cls}>
+          <span className="ccard__dot"></span>
+          {st.label}
+        </div>
+      </div>
+      <div className="ccard__metrics">
+        <div className="metric">
+          <div className="metric__value">
+            {cabin.live ? <span key={cabin.visits}>{cabin.visits}</span> : cabin.visits}
+          </div>
+          <div className="metric__label">Besuche heute</div>
+        </div>
+        <div className="metric">
+          <div className={"metric__value metric__value--" + rejAccent}>{cabin.rejection}%</div>
+          <div className="metric__label">Ablehnungsrate</div>
+        </div>
+        <div className="metric">
+          <div className="metric__value">{cabin.avgDur}</div>
+          <div className="metric__label">⌀ Verweildauer</div>
+        </div>
+        <div className="metric">
+          <div className="metric__value">{cabin.cleaned}</div>
+          <div className="metric__label">Letzte Reinigung</div>
+        </div>
+      </div>
+      <div className="ccard__bar">
+        <div className={"ccard__barfill ccard__barfill--" + st.cls}
+          style={{ width: Math.min(100, cabin.rejection * 3) + "%" }}></div>
+      </div>
+      {cabin.passThrus > 0 && (
+        <div className="ccard__reason" style={{ color: cabin.passThrus >= 5 ? "var(--red)" : "var(--amber)" }}>
+          <span className="ccard__reason-dot"></span>
+          {cabin.passThrus} Durchgänge ohne Verriegelung
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CabinDetailPanel({ cabin, liveData, onClose }) {
+  const st = STATUS[cabin.status];
+  const isLive = cabin.live;
+  const d = isLive ? {
+    doorOpens: liveData.doorOpens,
+    latches: liveData.latchEngages,
+    passThrus: liveData.passThrus,
+    battery: liveData.battery,
+    avgDuration: liveData.avgDuration,
+    reason: liveData.passThrus > 0 ? liveData.passThrus + " Durchgänge ohne Verriegelung erkannt" : "Normale Nutzung",
+    events: liveData.events,
+  } : (CABIN_DETAILS[cabin.no] || { doorOpens: cabin.visits, latches: Math.round(cabin.visits * 0.9), passThrus: 0, battery: 75, avgDuration: 180, reason: "—", events: [] });
+
+  const dotKind = { door: "door", latch: "latch", pass: "pass", clean: "clean" };
+
+  return (
+    <div className="detail-panel">
+      <div className="detail-panel__head">
+        <div className="detail-panel__title">
+          <span className="detail-panel__no">Kabine {cabin.no}</span>
+          <div className={"detail-panel__status detail-panel__status--" + st.cls}>
+            <span className="ccard__dot"></span>{st.label}
+          </div>
+        </div>
+        <button className="detail-panel__close" onClick={onClose}>×</button>
+      </div>
+      <div className="detail-panel__body">
+        <div className="detail-panel__col">
+          <div className="detail-col__head">Sensordaten</div>
+          <div className="dsrow">
+            <span className="dsrow__icon"><IconDoorSensor size={16} /></span>
+            <div className="dsrow__text">
+              <div className="dsrow__name">Dragino LDS02 — Türsensor</div>
+              <div className="dsrow__sub">Öffnungen erkannt</div>
+            </div>
+            <span className="dsrow__val">{d.doorOpens}×</span>
+          </div>
+          <div className="dsrow">
+            <span className="dsrow__icon"><IconLatch size={16} /></span>
+            <div className="dsrow__text">
+              <div className="dsrow__name">Dragino LDS02 — Riegelsensor</div>
+              <div className="dsrow__sub">Belegungen bestätigt · {d.passThrus} Durchgänge ohne Riegel</div>
+            </div>
+            <span className="dsrow__val">{d.latches}×</span>
+          </div>
+          <div className="dsrow">
+            <span className="dsrow__icon dsrow__icon--energy"><IconSolar size={16} /></span>
+            <div className="dsrow__text">
+              <div className="dsrow__name">Enerthing enerSENSE</div>
+              <div className="dsrow__sub">Akkustand (batterielos)</div>
+            </div>
+            <span className="dsrow__val">{d.battery}%</span>
+          </div>
+          {d.avgDuration > 0 && (
+            <div className="dsrow" style={{ background:"var(--accent-soft)", borderColor:"var(--accent)" }}>
+              <div className="dsrow__text">
+                <div className="dsrow__name" style={{ color:"var(--accent-ink)" }}>⌀ Verweildauer</div>
+                <div className="dsrow__sub">Ø Aufenthaltsdauer pro Besuch heute</div>
+              </div>
+              <span className="dsrow__val" style={{ color:"var(--accent-ink)" }}>{fmtDuration(d.avgDuration)}</span>
+            </div>
+          )}
+        </div>
+        <div className="detail-panel__col">
+          <div className="detail-col__head">Ereignisprotokoll</div>
+          <div className="evlog">
+            {d.events.length > 0 ? d.events.map((e, i) => (
+              <div key={i} className="evlog__item">
+                <span className="evlog__time">{e.time}</span>
+                <span className={"evlog__dot evlog__dot--" + (dotKind[e.kind] || "door")}></span>
+                <span className="evlog__msg">{e.msg}</span>
+              </div>
+            )) : <div style={{ color:"var(--ink-faint)", fontSize:12 }}>Keine Ereignisse verfügbar</div>}
+          </div>
+        </div>
+      </div>
+      {(cabin.status === "yellow" || cabin.status === "red") && (
+        <div className="detail-panel__cta">
+          <span className="detail-panel__reason">Grund: {d.reason}</span>
+          <button className={cabin.status === "red" ? "btn btn--urgent" : "btn btn--clean"}
+            onClick={() => onClean && onClean(cabin.no)}>
+            ✓ {cabin.status === "red" ? "Reinigung abgeschlossen" : "Reinigung abgeschlossen"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dashboard({ cabins, selectedCabin, activeCabinNo, onSelect, onClean, liveData }) {
+  const counts = cabins.reduce((a, c) => (a[c.status] = (a[c.status] || 0) + 1, a), {});
+  const sel = selectedCabin ? cabins.find(c => c.no === selectedCabin) : null;
+  return (
+    <section className="panel dash">
+      <div className="dash__head">
+        <h2>Flottenübersicht</h2>
+        <div className="dash__legend">
+          <span className="lg lg--ok"><i></i>{counts.green || 0} frei</span>
+          {counts.occupied > 0 && <span className="lg lg--occ"><i></i>{counts.occupied} besetzt</span>}
+          <span className="lg lg--warn"><i></i>{counts.yellow || 0} Achtung</span>
+          <span className="lg lg--crit"><i></i>{counts.red || 0} Reinigung</span>
+        </div>
+      </div>
+      <div className="dash__grid">
+        {cabins.map(c => (
+          <CabinCard key={c.no} cabin={c}
+            selected={selectedCabin === c.no}
+            active={activeCabinNo === c.no}
+            onSelect={onSelect} onClean={onClean} />
+        ))}
+      </div>
+      {sel && (
+        <div style={{ marginTop: 16 }}>
+          <CabinDetailPanel cabin={sel} liveData={liveData}
+            onClose={() => onSelect(sel.no)} onClean={onClean} />
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── App ── */
+const SPEEDS = [1, 5, 20];
+
+const INITIAL_CABINS = [
+  { no: "01", status: "green",  visits: 28, rejection: 4,  cleaned: "22 Min.",   avgDur: "3 Min.", passThrus: 0, live: true },
+  { no: "02", status: "yellow", visits: 47, rejection: 12, cleaned: "2h 10Min.", avgDur: "3 Min.", passThrus: 3 },
+  { no: "03", status: "red",    visits: 63, rejection: 28, cleaned: "5h 40Min.", avgDur: "5 Min.", passThrus: 8 },
+  { no: "04", status: "green",  visits: 31, rejection: 5,  cleaned: "48 Min.",   avgDur: "2 Min.", passThrus: 0 },
+  { no: "05", status: "yellow", visits: 52, rejection: 15, cleaned: "3h 05Min.", avgDur: "4 Min.", passThrus: 3 },
+  { no: "06", status: "green",  visits: 19, rejection: 6,  cleaned: "1h 12Min.", avgDur: "3 Min.", passThrus: 1 },
+];
+
+/* ── ROI Panel ── */
+function NumInput({ label, value, onChange, min, max, step = 1, unit = "" }) {
+  return (
+    <div style={{display:"flex", alignItems:"center", justifyContent:"space-between",
+      padding:"9px 13px", border:"1px solid var(--border)", borderRadius:9, background:"#f8fbfb", gap:10}}>
+      <span style={{fontSize:12.5, color:"var(--ink-soft)", flex:1}}>{label}</span>
+      <div style={{display:"flex", alignItems:"center", gap:6}}>
+        <button onClick={() => onChange(Math.max(min, Math.round((value - step) * 10) / 10))}
+          style={{width:24, height:24, borderRadius:6, border:"1px solid var(--border-strong)",
+            background:"#fff", cursor:"pointer", fontSize:14, lineHeight:1, color:"var(--ink-soft)"}}>−</button>
+        <span style={{fontFamily:"var(--font-mono)", fontWeight:700, fontSize:14,
+          minWidth:50, textAlign:"center"}}>{value}{unit}</span>
+        <button onClick={() => onChange(Math.min(max, Math.round((value + step) * 10) / 10))}
+          style={{width:24, height:24, borderRadius:6, border:"1px solid var(--border-strong)",
+            background:"#fff", cursor:"pointer", fontSize:14, lineHeight:1, color:"var(--ink-soft)"}}>+</button>
+      </div>
+    </div>
+  );
+}
+
+function ROIPanel() {
+  const [cabins,          setCabins]          = useState(20);
+  const [hourlyRate,      setHourlyRate]      = useState(24);
+  const [cleanDuration,   setCleanDuration]   = useState(15);
+  const [cleanTrad,       setCleanTrad]       = useState(4);
+  const [cleanSmart,      setCleanSmart]      = useState(2);
+  const [daysPerMonth,    setDaysPerMonth]    = useState(30);
+
+  const materialFlat       = 1.5;
+  const costPerCleaning    = Math.round(((cleanDuration / 60) * hourlyRate + materialFlat) * 10) / 10;
+  const hardwarePerCabin   = 175;
+  const totalHardware      = cabins * hardwarePerCabin;
+  const savedPerCabinDay   = (cleanTrad - cleanSmart) * costPerCleaning;
+  const savingsPerMonth    = cabins * savedPerCabinDay * daysPerMonth;
+  const amortMonths        = savingsPerMonth > 0 ? Math.ceil(totalHardware / savingsPerMonth) : "∞";
+  const amortColor         = typeof amortMonths === "number"
+    ? (amortMonths <= 6 ? "var(--green)" : amortMonths <= 18 ? "var(--amber)" : "var(--red)")
+    : "var(--red)";
+
+  return (
+    <section className="panel" style={{padding:"20px 24px"}}>
+      <h2 className="legend__title" style={{marginBottom:4}}>Kosten &amp; ROI-Kalkulation</h2>
+      <p style={{fontSize:12.5, color:"var(--ink-faint)", margin:"0 0 18px", fontFamily:"var(--font-mono)"}}>
+        Alle Annahmen anpassbar — Standardwerte sind typische Richtwerte für Festivals &amp; Großveranstaltungen.
+      </p>
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:24}}>
+
+        <div style={{display:"flex", flexDirection:"column", gap:8}}>
+          <div className="lsec__head">Annahmen (anpassbar)</div>
+
+          <div style={{display:"flex", alignItems:"center", gap:12,
+            padding:"9px 13px", border:"1px solid var(--border)", borderRadius:9, background:"#f8fbfb"}}>
+            <span style={{fontSize:12.5, color:"var(--ink-soft)", flex:1}}>Anzahl Kabinen</span>
+            <input type="range" min={5} max={200} step={5} value={cabins}
+              onChange={e => setCabins(+e.target.value)}
+              style={{width:90, accentColor:"var(--accent)"}} />
+            <span style={{fontFamily:"var(--font-mono)", fontWeight:700, fontSize:14, minWidth:34, textAlign:"right"}}>{cabins}</span>
+          </div>
+
+          <NumInput label="Ø Stundensatz Personal (inkl. Nebenkosten)" value={hourlyRate}
+            onChange={setHourlyRate} min={12} max={60} step={1} unit=" €" />
+          <NumInput label="Ø Dauer pro Reinigungszyklus" value={cleanDuration}
+            onChange={setCleanDuration} min={5} max={60} step={5} unit=" Min." />
+          <div style={{padding:"7px 13px", border:"1px solid var(--border)", borderRadius:9,
+            background:"#f8fbfb", fontSize:12, color:"var(--ink-faint)", display:"flex",
+            justifyContent:"space-between", alignItems:"center"}}>
+            <span>Kosten pro Reinigungseinsatz (berechnet)</span>
+            <span style={{fontFamily:"var(--font-mono)", fontWeight:700, fontSize:13,
+              color:"var(--accent-ink)"}}>{costPerCleaning.toFixed(2)} €</span>
+          </div>
+          <NumInput label="Reinigungen / Tag — traditionell (Zeitplan)"
+            value={cleanTrad} onChange={setCleanTrad} min={1} max={12} unit="×" />
+          <NumInput label="Reinigungen / Tag — mit System (bedarfsbasiert)"
+            value={cleanSmart} onChange={v => setCleanSmart(Math.min(v, cleanTrad - 0.5))}
+            min={0.5} max={cleanTrad - 0.5} step={0.5} unit="×" />
+          <NumInput label="Betriebstage pro Monat"
+            value={daysPerMonth} onChange={setDaysPerMonth} min={1} max={31} unit=" Tage" />
+
+          <div style={{padding:"11px 13px", border:"1px solid var(--border-strong)", borderRadius:10,
+            background:"#f2fafc", fontSize:12.5, color:"var(--ink-soft)", lineHeight:1.8, marginTop:2}}>
+            <b style={{color:"var(--accent-ink)", fontFamily:"var(--font-mono)"}}>Rechnung:</b><br/>
+            Kosten/Einsatz: ({cleanDuration} Min. ÷ 60) × {hourlyRate} € + 1,50 € Material = <b style={{color:"var(--accent-ink)"}}>{costPerCleaning.toFixed(2)} €</b><br/>
+            ({cleanTrad} − {cleanSmart}) × {costPerCleaning.toFixed(2)} € = <b style={{color:"var(--accent-ink)"}}>{savedPerCabinDay.toFixed(1)} € / Kabine / Tag</b><br/>
+            {cabins} Kabinen × {savedPerCabinDay.toFixed(1)} € × {daysPerMonth} Tage = <b style={{color:"var(--green)", fontSize:13}}>{Math.round(savingsPerMonth).toLocaleString("de-DE")} € / Monat</b>
+          </div>
+          <div style={{padding:"8px 13px", border:"1px solid var(--border)", borderRadius:8,
+            background:"#f8fbfb", fontSize:11, color:"var(--ink-faint)", lineHeight:1.5,
+            display:"flex", gap:6, alignItems:"flex-start"}}>
+            <span style={{fontSize:13}}>ℹ️</span>
+            <span><b style={{color:"var(--ink-soft)"}}>Kalkulationsbasis:</b> Berücksichtigt reale tarifliche Lohnkosten, Rüstzeiten und Materialverbrauch gemäß FM-Praxisstandards.</span>
+          </div>
+
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginTop:4}}>
+            {[
+              ["Hardware-Investition", `${totalHardware.toLocaleString("de-DE")} €`,
+               `${cabins} Kabinen × 175 €`, "var(--ink)"],
+              ["Einsparung / Monat", `${Math.round(savingsPerMonth).toLocaleString("de-DE")} €`,
+               "weniger Reinigungszyklen", "var(--green)"],
+              ["Amortisation", `${amortMonths}${typeof amortMonths === "number" ? " Mon." : ""}`,
+               "bis zur Kostendeckung", amortColor],
+              ["Einsparung / Jahr", `${Math.round(savingsPerMonth * 12).toLocaleString("de-DE")} €`,
+               "laufender Vorteil ab Jahr 2", "var(--green)"],
+            ].map(([label, val, sub, color]) => (
+              <div key={label} style={{padding:"12px 14px", border:"1px solid var(--border)", borderRadius:11, background:"#fbfdfd"}}>
+                <div style={{fontFamily:"var(--font-mono)", fontWeight:700, fontSize:19, color}}>{val}</div>
+                <div style={{fontWeight:600, fontSize:12.5, marginTop:2}}>{label}</div>
+                <div style={{fontSize:11, color:"var(--ink-faint)", marginTop:1}}>{sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{display:"flex", flexDirection:"column", gap:12}}>
+          <div className="lsec__head">Einmalige Kosten pro Kabine</div>
+          <div className="cmp">
+            <div className="cmp__head" style={{gridTemplateColumns:"1fr auto"}}>
+              <div className="cmp__col-head">Posten</div>
+              <div className="cmp__col-head" style={{borderRight:"none"}}>Betrag</div>
+            </div>
+            {[
+              ["2× EnOcean-LoRaWAN-Sensor (Tür & Riegel, batterielos)", "~140 €"],
+              ["Montage & Inbetriebnahme", "~30 €"],
+              ["Anteilig Gateway (Dragino DLOS8N / 50 Kabinen)", "~5 €"],
+              ["Gesamt Einmalinvestition pro Kabine", "175 €"],
+            ].map(([item, cost], i) => (
+              <div key={i} className="cmp__row" style={{gridTemplateColumns:"1fr auto",
+                background: i === 3 ? "var(--accent-soft)" : undefined}}>
+                <div className="cmp__cell" style={{fontWeight: i === 3 ? 700 : undefined}}>{item}</div>
+                <div className="cmp__cell" style={{fontFamily:"var(--font-mono)", fontWeight:700,
+                  color: i === 3 ? "var(--accent-ink)" : undefined}}>{cost}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="lsec__head" style={{marginTop:4}}>Laufende Kosten pro Kabine / Monat</div>
+          <div className="cmp">
+            <div className="cmp__head" style={{gridTemplateColumns:"1fr auto"}}>
+              <div className="cmp__col-head">Posten</div>
+              <div className="cmp__col-head" style={{borderRight:"none"}}>Betrag</div>
+            </div>
+            {[
+              ["Cloud-Plattform (LoRaWAN-Server, Dashboard)", "~2–5 €"],
+              ["SIM / 4G-Datentarif (anteilig)", "~1–2 €"],
+              ["Wartung & Support", "minimal"],
+            ].map(([item, cost], i) => (
+              <div key={i} className="cmp__row" style={{gridTemplateColumns:"1fr auto"}}>
+                <div className="cmp__cell">{item}</div>
+                <div className="cmp__cell" style={{fontFamily:"var(--font-mono)", fontWeight:600}}>{cost}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{padding:"12px 14px", background:"var(--amber-soft)",
+            border:"1px solid var(--amber)", borderRadius:10, fontSize:12.5,
+            color:"var(--ink-soft)", lineHeight:1.6}}>
+            <b style={{color:"var(--amber)"}}>Hinweis zu den Annahmen:</b> Bei Festivals mit hohem
+            Durchsatz (4+ Reinigungen/Tag) amortisiert sich die Investition in wenigen Wochen.
+            Bei Dauerinstallationen mit geringer Frequenz eher in 6–18 Monaten. Passe die Werte
+            links an deinen konkreten Anwendungsfall an.
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function doorDurFor(auto, speed) {
+  if (!auto) return 850;
+  return Math.max(130, Math.round(850 / speed));
+}
+
+function App() {
+  const [doorOpen, setDoorOpen]         = useState(false);
+  const [latched, setLatched]           = useState(false);
+  const [doorOpens, setDoorOpens]       = useState(0);
+  const [latchEngages, setLatchEngages] = useState(0);
+  const [passThrus, setPassThrus]       = useState(0);
+  const [battery, setBattery]           = useState(72);
+  const [charging, setCharging]         = useState(false);
+  const [packets, setPackets]           = useState(1284);
+  const [lastSensor, setLastSensor]     = useState(null);
+  const [gwTx, setGwTx]                 = useState(false);
+  const [auto, setAuto]                 = useState(false);
+  const [speed, setSpeed]               = useState(5);
+  const [cabins, setCabins]             = useState(INITIAL_CABINS);
+  const [selectedCabin, setSelectedCabin] = useState(null);
+  const [activeCabinNo, setActiveCabinNo] = useState("01");
+
+  // occupancy timer
+  const [occupancyTimer, setOccupancyTimer] = useState(0);
+  const occupancyStart   = useRef(null);
+  const occupancyTick    = useRef(null);
+
+  // duration tracking
+  const [durations, setDurations]   = useState([]);
+  const [avgDuration, setAvgDuration] = useState(0);
+
+  // event log for live cabin
+  const [liveEvents, setLiveEvents] = useState([]);
+
+  const doorOpenRef  = useRef(false);
+  const latchedRef   = useRef(false);
+  const prevLatchedRef = useRef(false); // was previously open (for pass-thru detection)
+  const chargeTimer  = useRef(null);
+  const txTimer      = useRef(null);
+  const autoTimer    = useRef(null);
+
+  const occupied = !doorOpen && latched;
+  const doorDur  = doorDurFor(auto, speed);
+
+  const now = () => {
+    const d = new Date();
+    return d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  };
+
+  // occupancy timer tick
+  useEffect(() => {
+    if (occupied) {
+      occupancyStart.current = Date.now();
+      setOccupancyTimer(0);
+      occupancyTick.current = setInterval(() => {
+        setOccupancyTimer(Math.round((Date.now() - occupancyStart.current) / 1000));
+      }, 1000);
+    } else {
+      clearInterval(occupancyTick.current);
+      if (occupancyStart.current) {
+        const dur = Math.round((Date.now() - occupancyStart.current) / 1000);
+        if (dur > 0) {
+          setDurations(prev => {
+            const next = [...prev, dur];
+            setAvgDuration(Math.round(next.reduce((a,b) => a+b, 0) / next.length));
+            return next;
+          });
+        }
+        occupancyStart.current = null;
+      }
+    }
+    return () => clearInterval(occupancyTick.current);
+  }, [occupied]);
+
+  // sync cabin 01 status
+  useEffect(() => {
+    setCabins(cs => cs.map(c =>
+      c.live ? { ...c, status: occupied ? "occupied" : "green" } : c
+    ));
+  }, [occupied]);
+
+  const flash = useCallback((dur) => {
+    setGwTx(true);
+    clearTimeout(txTimer.current);
+    txTimer.current = setTimeout(() => setGwTx(false), Math.min(400, dur));
+    setPackets(p => p + 1);
+    setCharging(true);
+    clearTimeout(chargeTimer.current);
+    chargeTimer.current = setTimeout(() => setCharging(false), dur + 250);
+    setBattery(b => Math.min(100, b + 1.2 + Math.random() * 1.5));
+  }, []);
+
+  const applyDoor = useCallback((open, dur) => {
+    setDoorOpen(open);
+    doorOpenRef.current = open;
+    flash(dur);
+    if (open) {
+      setDoorOpens(n => n + 1);
+      setLastSensor("door");
+      setCabins(cs => cs.map(c => c.live ? { ...c, visits: c.visits + 1 } : c));
+      setLiveEvents(ev => [{ time: now(), kind: "door", msg: "Tür geöffnet" }, ...ev].slice(0, 6));
+    } else {
+      setLastSensor("door");
+      // door closed without having been latched in between = pass-through
+      if (!latchedRef.current) {
+        setPassThrus(n => n + 1);
+        setCabins(cs => cs.map(c => c.live ? { ...c, passThrus: (c.passThrus || 0) + 1 } : c));
+        setLiveEvents(ev => [{ time: now(), kind: "pass", msg: "Tür auf/zu ohne Riegel — möglicher Durchgang" }, ...ev].slice(0, 6));
+      }
+    }
+  }, [flash]);
+
+  const applyLatch = useCallback((engage, dur) => {
+    setLatched(engage);
+    latchedRef.current = engage;
+    flash(dur);
+    if (engage) {
+      setLatchEngages(n => n + 1);
+      setLastSensor("latch");
+      setLiveEvents(ev => [{ time: now(), kind: "latch", msg: "Riegel eingerastet — Besetzt" }, ...ev].slice(0, 6));
+    } else {
+      setLastSensor("latch");
+      setLiveEvents(ev => [{ time: now(), kind: "latch", msg: "Riegel geöffnet — Person verlässt Kabine" }, ...ev].slice(0, 6));
+    }
+  }, [flash]);
+
+  const handleManualDoor = useCallback(() => {
+    if (auto || latched) return;
+    applyDoor(!doorOpenRef.current, 850);
+  }, [auto, latched, applyDoor]);
+
+  const handleManualLatch = useCallback(() => {
+    if (auto || doorOpenRef.current) return;
+    applyLatch(!latchedRef.current, 850);
+  }, [auto, applyLatch]);
+
+  // Auto-sim: full visit cycle
+  useEffect(() => {
+    if (!auto) return;
+    let cancelled = false;
+    const dur   = doorDurFor(true, speed);
+    const hold  = Math.max(180, Math.round(1100 / speed));
+    const visit = Math.max(300, Math.round(2200 / speed));
+
+    function step() {
+      if (cancelled) return;
+      applyDoor(true, dur);
+      autoTimer.current = setTimeout(() => {
+        if (cancelled) return;
+        applyDoor(false, dur);
+        autoTimer.current = setTimeout(() => {
+          if (cancelled) return;
+          applyLatch(true, dur);
+          autoTimer.current = setTimeout(() => {
+            if (cancelled) return;
+            applyLatch(false, dur);
+            autoTimer.current = setTimeout(() => {
+              if (cancelled) return;
+              applyDoor(true, dur);
+              autoTimer.current = setTimeout(() => {
+                if (cancelled) return;
+                applyDoor(false, dur);
+                autoTimer.current = setTimeout(step, hold);
+              }, dur + hold);
+            }, dur);
+          }, visit);
+        }, dur + 150);
+      }, dur + hold);
+    }
+    autoTimer.current = setTimeout(step, hold);
+    return () => { cancelled = true; clearTimeout(autoTimer.current); };
+  }, [auto, speed, applyDoor, applyLatch]);
+
+  useEffect(() => {
+    const id = setInterval(() => setBattery(b => b < 100 ? Math.min(100, b + 0.3) : b), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const handleAutoToggle = useCallback(() => {
+    setAuto(a => {
+      if (a) {
+        setDoorOpen(false); doorOpenRef.current = false;
+        setLatched(false);  latchedRef.current  = false;
+      }
+      return !a;
+    });
+  }, []);
+
+  const handleSelectCabin = useCallback((no) => {
+    setActiveCabinNo(no);
+    setSelectedCabin(prev => prev === no ? null : no);
+  }, []);
+
+  const handleClean = useCallback((no) => {
+    setCabins(cs => cs.map(c =>
+      c.no === no ? { ...c, status: c.status === "occupied" ? "occupied" : "green", cleaned: "Gerade eben", passThrus: 0 } : c
+    ));
+  }, []);
+
+  const liveData = { doorOpens, latchEngages, passThrus, battery, avgDuration, events: liveEvents };
+
+  // data shown in the top cabin view
+  const activeCabin = cabins.find(c => c.no === activeCabinNo);
+  const isLiveView  = activeCabinNo === "01";
+  const staticD     = CABIN_DETAILS[activeCabinNo] || {};
+  const viewProps   = isLiveView ? {
+    cabinNo: "01", isLive: true,
+    doorOpen, latched, occupied,
+    doorOpens, latchEngages, passThrus,
+    battery, charging, lastSensor, doorDur,
+    occupancyTimer, avgDuration,
+  } : {
+    cabinNo: activeCabinNo, isLive: false,
+    doorOpen: false, latched: false, occupied: false,
+    doorOpens: staticD.doorOpens || 0,
+    latchEngages: staticD.latches || 0,
+    passThrus: activeCabin?.passThrus || 0,
+    battery: staticD.battery || 75,
+    charging: false, lastSensor: null,
+    doorDur: 850, occupancyTimer: 0,
+    avgDuration: staticD.avgDuration || 0,
+  };
+
+  const view = window.location.hash.replace("#", "") || new URLSearchParams(window.location.search).get("view");
+
+  if (view === "roi") {
+    return <div className="app"><ROIPanel /></div>;
+  }
+
+  return (
+    <div className="app">
+      {/* Top bar */}
+      <header className="topbar">
+        <div className="brand">
+          <span className="brand__mark"></span>
+          <div className="brand__txt">
+            <span className="brand__name">SaniFair</span>
+            <span className="brand__sub">Smart Cabin Monitor</span>
+          </div>
+        </div>
+        <div className="topbar__summary">
+          <span className="sumitem"><b>6</b> Kabinen</span>
+          <span className="sep"></span>
+          <span className="sumitem"><b>18</b> Sensoren online</span>
+          <span className="sep"></span>
+          <span className="sumitem"><b>{packets.toLocaleString("de-DE")}</b> Datenpakete</span>
+        </div>
+        <Gateway packets={packets} online={true} tx={gwTx} />
+      </header>
+
+      {/* Cabin view — switches based on selected cabin */}
+      <CabinView {...viewProps} />
+
+      {/* Controls — only fully active for live cabin 01 */}
+      <section className="controls panel">
+        {isLiveView ? (<>
+          <div className="controls__group">
+            <button className={"btn btn--primary" + (auto || latched ? " is-disabled" : "")}
+              onClick={handleManualDoor} disabled={auto || latched}>
+              <span className={"btn__door" + (doorOpen ? " is-open" : "")}></span>
+              {doorOpen ? "Tür schließen" : "Tür öffnen"}
+            </button>
+            <button className={"btn " + (latched ? "btn--unlatch" : "btn--latch") + (!canLatch(auto, doorOpen) ? " is-disabled" : "")}
+              onClick={handleManualLatch} disabled={!canLatch(auto, doorOpen)}>
+              <IconLatch size={15} />
+              {latched ? "Entriegeln (Verlassen)" : "Verriegeln (Innen)"}
+            </button>
+            <button className="btn btn--clean" onClick={() => handleClean("01")}>
+              ✓ Reinigung abgeschlossen
+            </button>
+            <span className="controls__cap">Manuelle Steuerung · Kabine 01</span>
+          </div>
+          <div className="controls__divider"></div>
+          <div className="controls__group">
+            <button className={"btn btn--auto" + (auto ? " is-active" : "")} onClick={handleAutoToggle}>
+              {auto ? <IconPause size={15} /> : <IconPlay size={15} />}
+              {auto ? "Simulation stoppen" : "Auto-Simulation"}
+            </button>
+            <div className="speedseg">
+              {SPEEDS.map(s => (
+                <button key={s} className={"speedseg__btn" + (speed === s ? " is-on" : "")} onClick={() => setSpeed(s)}>{s}×</button>
+              ))}
+            </div>
+            <span className="controls__cap">
+              {auto ? `Läuft mit ${speed}× — vollständiger Besuchszyklus` : "Öffnen → Verriegeln → Entriegeln → Verlassen"}
+            </span>
+          </div>
+        </>) : (
+          <div className="controls__group">
+            <span style={{fontSize:13, color:"var(--ink-soft)"}}>
+              Ansicht: <b>Kabine {activeCabinNo}</b> — historische Daten (nur Kabine 01 ist live steuerbar)
+            </span>
+            <button className="btn" onClick={() => { setActiveCabinNo("01"); setSelectedCabin(null); }}>
+              ← Zurück zu Kabine 01
+            </button>
+            {(activeCabin?.status === "yellow" || activeCabin?.status === "red") && (
+              <button className={activeCabin.status === "red" ? "btn btn--urgent" : "btn btn--clean"}
+                onClick={() => handleClean(activeCabinNo)}>
+                ✓ Reinigung abgeschlossen
+              </button>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* Fleet dashboard */}
+      <Dashboard cabins={cabins} selectedCabin={selectedCabin} activeCabinNo={activeCabinNo}
+        onSelect={handleSelectCabin} onClean={handleClean} liveData={liveData} />
+
+    </div>
+  );
+}
+
+function canLatch(auto, doorOpen) {
+  return !auto && !doorOpen;
+}
+
+/* ── Hardware panel ── */
+function HardwarePanel() {
+  return (
+    <section className="panel hw">
+      <h2 className="legend__title">Hardware &amp; Technologie</h2>
+      <div className="hw__sections">
+
+        {/* Device cards */}
+        <div className="hw__devices">
+          <div className="hcard">
+            <div className="hcard__img">🚪</div>
+            <div className="hcard__body">
+              <div className="hcard__name">Türsensor &amp; Riegelsensor</div>
+              <div className="hcard__model">EnOcean-LoRaWAN-Sensor (batterielos, 2× pro Kabine)</div>
+              <div className="hcard__desc">
+                Echter Energy-Harvesting-Sensor — integriertes Solarpanel lädt sich über Umgebungslicht
+                selbst auf, komplett ohne Batterie. Erkennt Öffnen/Schließen der Tür sowie Einrasten des
+                Riegels und sendet jedes Ereignis sofort per LoRaWAN. Kein Kabelbedarf, keine Wartung.
+              </div>
+              <div className="hcard__tags">
+                <span className="htag htag--amber">Batterielos</span>
+                <span className="htag htag--teal">LoRaWAN</span>
+                <span className="htag htag--green">Energy Harvesting</span>
+                <span className="htag htag--ink">Kein Kabel nötig</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hcard">
+            <div className="hcard__img">📡</div>
+            <div className="hcard__body">
+              <div className="hcard__name">LoRaWAN-Gateway</div>
+              <div className="hcard__model">Dragino DLOS8N Outdoor Gateway (~250 €)</div>
+              <div className="hcard__desc">
+                Empfängt alle Sensordaten per LoRaWAN und leitet sie über 4G/LTE an die Cloud weiter.
+                Ein einziges Gateway deckt typisch <b>50 Kabinen</b> ab — selbst durch Wände und
+                Stockwerke hindurch. Bei 50 Kabinen: ~5 € pro Kabine anteilig.
+              </div>
+              <div className="hcard__tags">
+                <span className="htag htag--teal">4G / LTE</span>
+                <span className="htag htag--teal">LoRaWAN</span>
+                <span className="htag htag--ink">Outdoor IP65</span>
+                <span className="htag htag--ink">1 Gateway = 50 Kabinen</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Comparison table */}
+        <div>
+          <div className="lsec__head" style={{marginBottom:10}}>LoRaWAN vs. Kabelgebundene Lösung</div>
+          <div className="cmp">
+            <div className="cmp__head">
+              <div className="cmp__col-head">Kriterium</div>
+              <div className="cmp__col-head">✦ LoRaWAN (diese Lösung)</div>
+              <div className="cmp__col-head">Kabel + Strom</div>
+            </div>
+            {[
+              ["Installation", <span className="cmp__ok">Aufkleben, fertig — kein Handwerker</span>, <span className="cmp__bad">Kabel verlegen, bohren, Elektriker</span>],
+              ["Stromversorgung", <span className="cmp__ok">Batterielos — Solarpanel lädt über Umgebungslicht</span>, <span className="cmp__bad">220V-Anschluss pro Kabine nötig</span>],
+              ["Nachrüstung", <span className="cmp__ok">Jederzeit, ohne Umbau</span>, <span className="cmp__bad">Aufwändige Baumaßnahmen</span>],
+              ["Reichweite", <span className="cmp__ok">Bis 10 km, durch Wände</span>, <span className="cmp__bad">Beschränkt auf Kabellänge</span>],
+              ["Skalierbarkeit", <span className="cmp__ok">1 Gateway → 50+ Kabinen</span>, <span className="cmp__mid">Jede Kabine eigener Anschluss</span>],
+              ["Wartung", <span className="cmp__ok">Minimal — kein Kabel, selten Batterie</span>, <span className="cmp__mid">Kabelschäden, Steckerkontakte</span>],
+              ["Kosten pro Kabine", <span className="cmp__ok">~175 € Einmalinvestition (inkl. Montage)</span>, <span className="cmp__bad">Hoch durch Installation & Kabel</span>],
+              ["Outdoor-tauglich", <span className="cmp__ok">IP65/67, Regen, Hitze, Kälte</span>, <span className="cmp__mid">Aufwändige Abdichtung nötig</span>],
+            ].map(([label, good, bad], i) => (
+              <div className="cmp__row" key={i}>
+                <div className="cmp__cell">{label}</div>
+                <div className="cmp__cell">{good}</div>
+                <div className="cmp__cell">{bad}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+/* ── Legend / Info panel ── */
+function LegendPanel() {
+  return (
+    <section className="panel legend">
+      <h2 className="legend__title">Legende &amp; Erklärung</h2>
+      <div className="legend__sections">
+
+        {/* Status-Farben */}
+        <div>
+          <div className="lsec__head">Statusfarben der Kabinen</div>
+          <div className="lsec__items">
+            <div className="litem">
+              <span className="litem__badge litem__badge--green">Frei &amp; sauber</span>
+              <span className="litem__text">Kabine ist verfügbar, Reinigung nicht erforderlich.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__badge litem__badge--teal">Besetzt</span>
+              <span className="litem__text">Riegel eingerastet — Person befindet sich in der Kabine. Verweildauer wird live gemessen.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__badge litem__badge--amber">Achtung</span>
+              <span className="litem__text">Kabine hat <b>mehrere Durchgänge ohne Verriegelung</b> oder wurde längere Zeit nicht gereinigt.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__badge litem__badge--red">Reinigung</span>
+              <span className="litem__text">Reinigungsschwelle überschritten. Sofortiger Handlungsbedarf.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Metriken */}
+        <div>
+          <div className="lsec__head">Was bedeuten die Kennzahlen?</div>
+          <div className="lsec__items">
+            <div className="litem">
+              <span className="litem__dot" style={{background:"var(--ink)"}}></span>
+              <span className="litem__text"><b>Besuche heute</b> — Anzahl der Türöffnungen seit Betriebsbeginn.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__dot" style={{background:"var(--amber)"}}></span>
+              <span className="litem__text"><b>Ablehnungsrate</b> — Anteil der Personen, die eine besetzte Kabine vorgefunden haben und warten mussten oder weggegangen sind.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__dot" style={{background:"var(--accent)"}}></span>
+              <span className="litem__text"><b>⌀ Verweildauer</b> — Durchschnittliche Zeit zwischen Verriegelung und Entriegelung pro Besuch. Gibt Aufschluss über Nutzungsintensität.</span>
+            </div>
+            <div className="litem">
+              <span className="litem__dot" style={{background:"var(--red)"}}></span>
+              <span className="litem__text"><b>Durchgänge ohne Verriegelung</b> — Tür wurde geöffnet und geschlossen, aber kein Riegel erkannt. Mögliche Schmierigkeit ohne nachgewiesene Nutzung.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Sensorlogik */}
+        <div>
+          <div className="lsec__head">Wie erkennt das System Belegung?</div>
+          <div style={{marginBottom:12}}>
+            <div style={{fontSize:12, color:"var(--ink-soft)", marginBottom:10}}>
+              Eine Türöffnung allein reicht <b>nicht</b> aus — erst der Riegel bestätigt echte Nutzung:
+            </div>
+            <div className="flow">
+              <div className="flow__step">
+                <div className="flow__num">1</div>
+                <div className="flow__label">Tür öffnet</div>
+                <div className="flow__sub">Türsensor schlägt an</div>
+              </div>
+              <div className="flow__arrow">→</div>
+              <div className="flow__step">
+                <div className="flow__num">2</div>
+                <div className="flow__label">Tür schließt</div>
+                <div className="flow__sub">+ Riegel einrastet</div>
+              </div>
+              <div className="flow__arrow">→</div>
+              <div className="flow__step flow__step--result-ok">
+                <div className="flow__num">✓</div>
+                <div className="flow__label">Besetzt</div>
+                <div className="flow__sub">Timer läuft</div>
+              </div>
+            </div>
+            <div style={{fontSize:11, color:"var(--ink-faint)", margin:"8px 0 10px", fontFamily:"var(--font-mono)"}}>vs. ohne Riegel:</div>
+            <div className="flow">
+              <div className="flow__step">
+                <div className="flow__num">1</div>
+                <div className="flow__label">Tür öffnet</div>
+                <div className="flow__sub">Türsensor schlägt an</div>
+              </div>
+              <div className="flow__arrow">→</div>
+              <div className="flow__step">
+                <div className="flow__num">2</div>
+                <div className="flow__label">Tür schließt</div>
+                <div className="flow__sub">kein Riegel</div>
+              </div>
+              <div className="flow__arrow">→</div>
+              <div className="flow__step flow__step--result-warn">
+                <div className="flow__num">⚠</div>
+                <div className="flow__label">Durchgang</div>
+                <div className="flow__sub">Achtung-Zähler +1</div>
+              </div>
+            </div>
+          </div>
+          <div style={{fontSize:12, color:"var(--ink-faint)", fontFamily:"var(--font-mono)", lineHeight:1.5}}>
+            Sensoren sind batterielos (Energy Harvesting) — integriertes Solarpanel lädt sich über Umgebungslicht selbst auf.
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

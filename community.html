@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KI-Community Niedersachsen, Viktor Weber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- OG / Social Meta -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Von null zur KI-Community · Viktor Weber" />
+  <meta property="og:description" content="Wie ich von null eine aktive KI-Community in Braunschweig aufgebaut habe: 290+ Mitglieder, regelmäßige Events, offizielles Global AI Chapter." />
+  <meta property="og:image"       content="social-preview.png" />
+  <meta property="og:url"         content="https://viktorweber.de/community.html" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Von null zur KI-Community · Viktor Weber" />
+  <meta name="twitter:description" content="290+ Mitglieder, regelmäßige Events, offizielles Global AI Chapter, von null aufgebaut." />
+  <meta name="twitter:image"      content="social-preview.png" />
+  <link rel="icon" type="image/png" href="Design ohne Titel(3).png">
+  <link rel="apple-touch-icon" href="Design ohne Titel(3).png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Project Detail Page ── */
+    .detail-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .detail-nav__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .detail-nav__back:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+    .detail-nav__back svg { width: 16px; height: 16px; }
+    .detail-nav__name {
+      font-family: var(--display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 7px 16px;
+    }
+
+    .detail-hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-hero__tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .detail-hero__title {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.2vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 10px;
+    }
+    .detail-hero__sub {
+      font-size: 16px;
+      color: var(--ink-faint);
+    }
+
+    .detail-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-meta { display: flex; flex-direction: column; gap: 24px; }
+    .detail-meta__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .detail-meta__items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-meta__item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+
+    .detail-content {}
+    .detail-content__section { margin-bottom: 32px; }
+    .detail-content__section-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .detail-content__text {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+    .detail-content__text + .detail-content__text { margin-top: 12px; }
+
+    /* ── Media section ── */
+    .detail-media {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-media__label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+    .media-layout {
+      display: flex;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    /* Phone mockup */
+    .phone-mockup {
+      flex-shrink: 0;
+      width: 260px;
+      background: #e8e6e3;
+      border-radius: 44px;
+      padding: 12px 8px 16px;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.08),
+        0 2px 0 1px rgba(255,255,255,0.9) inset,
+        0 32px 64px rgba(0,0,0,0.18),
+        0 8px 24px rgba(0,0,0,0.1);
+    }
+    .phone-notch {
+      width: 60px;
+      height: 9px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      margin: 0 auto 8px;
+    }
+    .phone-screen {
+      border-radius: 32px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      aspect-ratio: 9/16;
+    }
+    .phone-screen video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .phone-play {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .phone-play:hover { background: rgba(0,0,0,0.15); }
+    .phone-play svg {
+      width: 60px;
+      height: 60px;
+      color: #fff;
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
+    }
+
+    /* Photo cols */
+    .media-photo-col {
+      flex: 1;
+      min-width: 0;
+      max-width: 200px;
+    }
+    .media-photo {
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--border);
+      height: 100%;
+    }
+    .media-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── Links section ── */
+    .detail-links {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 40px 80px;
+    }
+    .detail-link-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .detail-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
+      border-radius: 999px;
+      padding: 8px 18px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .detail-link:hover { background: rgba(255,255,255,0.85); }
+    .detail-link svg { flex-shrink: 0; color: var(--ink-soft); }
+
+    .detail-preview {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 80px;
+    }
+    .detail-preview__label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+    .preview-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin-bottom: 20px;
+    }
+    .preview-card--iframe {
+      height: 480px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-card--iframe iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .preview-card__label {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 640px) {
+      .detail-nav { padding: 20px 24px; }
+      .detail-hero, .detail-body, .detail-media, .detail-links, .detail-preview { padding-left: 24px; padding-right: 24px; }
+      .detail-body { grid-template-columns: 1fr; gap: 40px; }
+      .media-layout { flex-direction: column; }
+      .phone-mockup { width: 200px; }
+      .media-photos { grid-template-columns: 1fr 1fr; }
+      .preview-card--iframe { height: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="detail-nav">
+    <div class="nav__pill">
+      <a href="index.html" class="detail-nav__back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+        <span data-i18n="back">Zurück</span>
+      </a>
+      <span class="detail-nav__name">Viktor Weber</span>
+      <button class="lang-toggle" id="langToggle">EN</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="detail-hero">
+    <p class="detail-hero__tag" data-i18n="cm_tag">Ecosystem Strategy &amp; Community Building · Okt 2024 bis heute</p>
+    <h1 class="detail-hero__title" data-i18n-html="cm_title">Ecosystem Building:<br>Die AI Community Niedersachsen</h1>
+    <p class="detail-hero__sub" data-i18n="cm_sub">Wie aus einer strategischen Marktlücke ein führendes regionales Tech-Ökosystem mit über 290 aktiven Mitgliedern und internationaler Verankerung entstand.</p>
+  </header>
+
+  <!-- BODY: Meta + Content -->
+  <div class="detail-body">
+
+    <aside class="detail-meta">
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_role">Meine Rolle</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">Founder &amp; Ecosystem Strategist</span>
+          <span class="detail-meta__item">Ecosystem Operator</span>
+          <span class="detail-meta__item">Tech Evangelist</span>
+          <span class="detail-meta__item">Community Lead</span>
+        </div>
+      </div>
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_format">Format</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">Speaker-Events</span>
+          <span class="detail-meta__item">Workshops</span>
+          <span class="detail-meta__item">Networking</span>
+        </div>
+      </div>
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_time">Zeitraum</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">Okt 2024 – heute</span>
+        </div>
+      </div>
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_chapter">Chapter</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">Global AI Community</span>
+          <span class="detail-meta__item">Braunschweig</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="detail-content">
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="cm_sec1">Die Marktvalidierung</p>
+        <p class="detail-content__text" data-i18n="cm_text1">
+          Ende 2024 identifizierte ich eine strukturelle Marktlücke in der Region: Es fehlte eine agile, praxisnahe Plattform, die KI-Anwender, Entrepreneure und Entscheider gezielt zusammenbringt. Die strategische Zielsetzung bestand darin, ein kollaboratives Innovations-Ökosystem aufzubauen, das echten Wissenstransfer fördert, Silos aufbricht und lokale Synergien bündelt.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="cm_sec2">Strategie &amp; operative Steuerung</p>
+        <p class="detail-content__text" data-i18n="cm_text2">
+          Die Konzeption, das Partnermanagement und die Skalierung der gesamten Community-Infrastruktur liegen vollständig in meiner Verantwortung. Das umfasst das Sourcing hochkarätiger Speaker, das Verhandeln von strategischem Location-Sponsoring sowie den Aufbau einer integrierten digitalen Plattform-Architektur (Webpräsenz, Automatisierung und geschlossene Kommunikationskanäle zur Nutzeraktivierung).
+        </p>
+        <p class="detail-content__text" data-i18n="cm_text3">
+          Durch die strategische Akkreditierung als offizielles Kapitel der globalen Organisation „Global AI Community" wurde das regionale Netzwerk international verankert. Die Events sind als offene Innovationsplattformen konzipiert, um maximale Reichweite und eine niedrige Barriere für Wissenstransfer zu garantieren.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="cm_sec3">Der Business Impact</p>
+        <p class="detail-content__text" data-i18n="cm_text4">
+          Was als zielgerichtete Initiative startete, hat sich in kürzester Zeit zum führenden Knotenpunkt für KI-Interessierte der Region entwickelt. Das Projekt demonstriert tiefes Verständnis für Community-Led Growth, agile Markenführung und das Management komplexer Stakeholder-Interessen. Die resultierende Marktpositionierung führte folgerichtig zu Folgeeinladungen als Fach-Speaker auf externen Tech- und Enterprise-Events.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MEDIA -->
+  <section class="detail-media">
+    <p class="detail-media__label" data-i18n="cm_impressions">Impressionen</p>
+    <div class="comm-bento">
+      <div class="comm-bento__photo"><img src="IMG_4255.jpeg" alt="KI Event" style="object-position: center 20%;"></div>
+      <div class="comm-bento__video">
+        <video id="detailVideo" src="AI_Event_Video.mov" playsinline loop></video>
+        <button class="comm-bento__play" onclick="(function(){var v=document.getElementById('detailVideo');this.style.display='none';v.controls=true;v.play();}).call(this)" aria-label="Play">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+      <div class="comm-bento__photo"><img src="PNG Image.png" alt="KI Event"></div>
+    </div>
+  </section>
+
+  <!-- LIVE PREVIEW -->
+  <section class="detail-preview">
+    <p class="detail-preview__label" data-i18n="bs_preview_label">Vorschau</p>
+    <p class="preview-hint">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      <span data-i18n="bs_hint">Klicke dich durch…</span>
+    </p>
+    <div class="preview-card--iframe">
+      <iframe
+        src="https://ai-community-niedersachsen.de/"
+        title="AI Community Niedersachsen Live"
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
+      <span class="preview-card__label">Live Demo</span>
+    </div>
+  </section>
+
+  <!-- PLATFORM LINKS -->
+  <section class="detail-links">
+    <p class="detail-links__label" data-i18n="cm_platforms">Plattformen</p>
+    <div class="plattform-grid">
+
+      <!-- Telegram -->
+      <a href="https://t.me/AICommunityNiedersachsen" target="_blank" rel="noopener" class="plattform-card">
+        <div class="plattform-card__icon" style="background:#e8f4fb; color:#229ED9;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M21.5 2 2 9.5l7.5 3 3 7.5 9-18zM9.5 12.5l5.5-3.5-3.5 5.5-1.5-2z"/></svg>
+        </div>
+        <div class="plattform-card__body">
+          <span class="plattform-card__name">Telegram</span>
+          <span class="plattform-card__desc" data-i18n="cm_tg_desc">Zentraler Kommunikations-Hub für den asynchronen B2B- &amp; Tech-Austausch, aktives Peer-to-Peer-Feedback und kollaborative Projektinitiierung.</span>
+        </div>
+        <span class="plattform-card__arrow">↗</span>
+      </a>
+
+      <!-- Meetup -->
+      <a href="https://www.meetup.com/de-DE/global-ai-braunschweig/" target="_blank" rel="noopener" class="plattform-card">
+        <div class="plattform-card__icon" style="background:#fff0f0; color:#ED1C40;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="plattform-card__body">
+          <span class="plattform-card__name">Meetup · Global AI Braunschweig</span>
+          <span class="plattform-card__desc" data-i18n="cm_mu_desc">Strategischer Kanal für das Event-Marketing, Besuchermanagement und die zielgruppenspezifische Reichweitenaktivierung in der Region.</span>
+        </div>
+        <span class="plattform-card__arrow">↗</span>
+      </a>
+
+      <!-- Luma -->
+      <a href="https://lu.ma/calendar/cal-IVen5wFWYFZ57JW" target="_blank" rel="noopener" class="plattform-card">
+        <div class="plattform-card__icon" style="background:#f0f0ff; color:#6B5CE7;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="plattform-card__body">
+          <span class="plattform-card__name">Luma Events</span>
+          <span class="plattform-card__desc" data-i18n="cm_lu_desc">Integriertes Ticketing- und CRM-Tool für die nahtlose Event-Skalierung, Teilnehmererfassung und das Touchpoint-Management.</span>
+        </div>
+        <span class="plattform-card__arrow">↗</span>
+      </a>
+
+      <!-- Website -->
+      <a href="https://ai-community-niedersachsen.de/" target="_blank" rel="noopener" class="plattform-card">
+        <div class="plattform-card__icon" style="background:#e8f4e8; color:#2A7A2A;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div class="plattform-card__body">
+          <span class="plattform-card__name">AI Community Niedersachsen</span>
+          <span class="plattform-card__desc" data-i18n="cm_web_desc">Zentrales digitales Schaufenster und funktionale Conversion-Infrastruktur des Ökosystems zur primären Informationsvermittlung und Nutzer-Akquise.</span>
+        </div>
+        <span class="plattform-card__arrow">↗</span>
+      </a>
+
+    </div>
+  </section>
+
+  <footer class="detail-footer-new">
+    <a href="index.html" class="detail-footer-new__back" data-i18n="back_portfolio">← Zurück zum Portfolio</a>
+    <span class="detail-footer-new__copy">© 2026 Viktor Weber</span>
+    <div></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+</body>
+</html>

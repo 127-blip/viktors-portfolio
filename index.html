@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viktor Weber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <!-- OG / Social Meta -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Viktor Weber · Senior Product Manager & AI Builder" />
+  <meta property="og:description" content="19+ Jahre Produkt-Erfahrung. Ich baue mit Claude API, MCP und n8n intelligente Workflows und MVPs, von der Idee bis zur Produktion." />
+  <meta property="og:image"       content="social-preview.png" />
+  <meta property="og:url"         content="https://viktorweber.de/" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Viktor Weber · Senior Product Manager & AI Builder" />
+  <meta name="twitter:description" content="19+ Jahre Produkt-Erfahrung. Ich baue mit Claude API, MCP und n8n intelligente Workflows und MVPs." />
+  <meta name="twitter:image"      content="social-preview.png" />
+  <link rel="icon" type="image/png" href="Design ohne Titel(3).png">
+  <link rel="apple-touch-icon" href="Design ohne Titel(3).png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .comm-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+      transition: color 0.2s, background 0.2s;
+    }
+    .comm-link:hover { color: var(--ink); background: rgba(255,255,255,0.8); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav__pill">
+      <a href="#" class="active" id="nav-home">Viktor Weber</a>
+      <a href="#work" id="nav-work" data-i18n="nav_work">Projekte</a>
+      <a href="#about" id="nav-about" data-i18n="nav_about">Über mich</a>
+      <a href="#contact" id="nav-contact" data-i18n="nav_contact">Kontakt</a>
+      <button class="lang-toggle" id="langToggle">EN</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero__text">
+      <p class="hero__role" data-i18n="hero_role">Senior Product Manager &amp; AI Builder</p>
+      <h1 class="hero__hook" data-i18n="hero_hook">An der Schnittstelle von Tech &amp; Business-Strategie:</h1>
+      <p class="hero__exec" data-i18n="hero_exec">Intelligente, skalierbare Workflows und validierte MVPs – präzise konzipiert, um echten Geschäftswert zu schaffen.</p>
+      <ul class="hero__bullets">
+        <li><span class="hero__check">✓</span><span data-i18n="hero_b1">19+ Jahre Enterprise Product Management &amp; Tech Consulting (u.a. Volkswagen)</span></li>
+        <li><span class="hero__check">✓</span><span data-i18n="hero_b2">AI Builder &amp; Automation Architect: Claude API · MCP · n8n Workflows</span></li>
+        <li><span class="hero__check">✓</span><span data-i18n="hero_b3">Gründer &amp; Community Manager der AI Community Niedersachsen</span></li>
+      </ul>
+    </div>
+    <div class="hero__visual">
+      <img src="Viktor_komplett.jpeg" alt="Viktor Weber" class="hero__photo">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span> Open to Work
+      </div>
+    </div>
+  </header>
+
+  <!-- WORK -->
+  <main id="work">
+    <p class="work__label" data-i18n="nav_work">Projekte</p>
+
+    <!-- VW Enterprise Card -->
+    <div class="vw-enterprise-card">
+      <div class="vw-enterprise-card__sidebar">
+        <div class="vw-logo-container">
+          <svg viewBox="25 25 100 100" xmlns="http://www.w3.org/2000/svg" class="vw-official-2019-logo">
+            <path d="M75,120.4c-24.9,0-45.3-20.5-45.3-45.4c0-5.6,1-10.9,2.9-15.9l26.5,53.3c0.3,0.7,0.8,1.3,1.6,1.3c0.8,0,1.3-0.6,1.6-1.3l12.2-27.3c0.1-0.3,0.3-0.6,0.6-0.6s0.4,0.3,0.6,0.6l12.2,27.3c0.3,0.7,0.8,1.3,1.6,1.3c0.8,0,1.3-0.6,1.6-1.3l26.5-53.3c1.9,5,2.9,10.3,2.9,15.9C120.3,99.9,99.9,120.4,75,120.4z M75,64.7c-0.3,0-0.4-0.3-0.6-0.6l-14.2-32c4.6-1.7,9.6-2.6,14.8-2.6c5.2,0,10.2,0.9,14.8,2.6l-14.2,32C75.4,64.5,75.3,64.7,75,64.7z M60.5,97.6c-0.3,0-0.4-0.3-0.6-0.6l-23-46.4c4.1-6.3,9.6-11.6,16.3-15.3l16.6,36.9C70,72.8,70.5,73,71,73h8c0.6,0,1-0.1,1.3-0.8l16.6-36.9c6.6,3.7,12.2,9,16.3,15.3L90,97c-0.1,0.3-0.3,0.6-0.6,0.6c-0.3,0-0.4-0.3-0.6-0.6l-8.7-19.8c-0.3-0.7-0.7-0.8-1.3-0.8h-8c-0.6,0-1,0.1-1.3,0.8L61.1,97C61,97.3,60.8,97.6,60.5,97.6z M75,125c27.7,0,50-22.3,50-50c0-27.7-22.3-50-50-50c-27.7,0-50,22.3-50,50C25,102.7,47.3,125,75,125z" fill="#001E50"/>
+          </svg>
+        </div>
+        <span class="vw-enterprise-card__badge">VOLKSWAGEN AG</span>
+        <div class="vw-enterprise-card__meta" data-i18n="vw_meta">18 Jahre Automotive Innovation &amp; Transformation</div>
+        <ul class="vw-enterprise-card__tags">
+          <li>Computer Vision</li>
+          <li data-i18n="vw_tag2">Produktstrategie &amp; Skalierung</li>
+          <li>Regulatory &amp; Compliance Rollout</li>
+        </ul>
+      </div>
+      <div class="vw-enterprise-card__content">
+        <div class="vw-enterprise-card__row">
+          <div class="vw-enterprise-card__label">
+            <span class="vw-label-icon"><svg viewBox="0 0 20 20" fill="none" stroke="#001E50" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><path d="M1,10 C4,5 7,2.5 10,2.5 C13,2.5 16,5 19,10 C16,15 13,17.5 10,17.5 C7,17.5 4,15 1,10Z"/><circle cx="10" cy="10" r="3.2"/><circle cx="10" cy="10" r="1.2" fill="#001E50" stroke="none"/></svg></span>
+            Computer Vision &amp; GenAI
+          </div>
+          <p class="vw-enterprise-card__text" data-i18n="vw_text1">Konzeption eines ML-Modells zur automatisierten Bilderkennung und Fehlerdiagnose bei Scheinwerfersystemen sowie eines LLM-basierten Werkstatt-Chatbots für globale After-Sales-Prozesse.</p>
+        </div>
+        <div class="vw-enterprise-card__row">
+          <div class="vw-enterprise-card__label">
+            <span class="vw-label-icon"><svg viewBox="0 0 20 20" fill="none" stroke="#001E50" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg"><circle cx="3.5" cy="10" r="2"/><circle cx="16.5" cy="4.5" r="1.8"/><circle cx="16.5" cy="10" r="1.8"/><circle cx="16.5" cy="15.5" r="1.8"/><line x1="5.5" y1="10" x2="14.7" y2="4.5"/><line x1="5.5" y1="10" x2="14.7" y2="10"/><line x1="5.5" y1="10" x2="14.7" y2="15.5"/></svg></span>
+            E2E Platform Transformation &amp; Multi-Brand Scale
+          </div>
+          <p class="vw-enterprise-card__text" data-i18n="vw_text2">Transformation einer bestehenden Ein-Marken-Diagnoseplattform in eine konzernweite Multi-Marken-Lösung (VW, SEAT, VW Nutzfahrzeuge) mit einer Reduktion der Betriebskosten um 11% und einer Steigerung des Projekt-ROI um 35%.</p>
+        </div>
+        <div class="vw-enterprise-card__row">
+          <div class="vw-enterprise-card__label">
+            <span class="vw-label-icon"><svg viewBox="0 0 20 20" fill="none" stroke="#001E50" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M8.58,4.69 L8.61,2.12 L11.39,2.12 L11.42,4.69 A5.5,5.5 0 0,1 13.89,6.11 L16.13,4.86 L17.52,7.26 L15.31,8.58 A5.5,5.5 0 0,1 15.31,11.42 L17.52,12.74 L16.13,15.14 L13.89,13.89 A5.5,5.5 0 0,1 11.42,15.31 L11.39,17.88 L8.61,17.88 L8.58,15.31 A5.5,5.5 0 0,1 6.11,13.89 L3.87,15.14 L2.48,12.74 L4.69,11.42 A5.5,5.5 0 0,1 4.69,8.58 L2.48,7.26 L3.87,4.86 L6.11,6.11 A5.5,5.5 0 0,1 8.58,4.69Z"/><circle cx="10" cy="10" r="3.5"/></svg></span>
+            Systems Engineering &amp; Automation
+          </div>
+          <p class="vw-enterprise-card__text" data-i18n="vw_text3">Projektleitung bei der Einführung des gesetzlichen ERA-GLONASS-Notrufsystems für 1,2 Mio. Fahrzeuge. Nachhaltige Einsparung von 500.000 €/Jahr durch konsequente Backend-Automatisierung.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-grid">
+
+      <!-- SaaS Booking Platform — wide -->
+      <a href="barbershop.html" class="tile tile--wide">
+        <div class="tile__visual">
+          <iframe src="https://viktors-barbershop-demo.vercel.app/" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" tabindex="-1"></iframe>
+        </div>
+        <span class="tile__arrow" data-i18n="tile_cta">Ansehen ↗</span>
+        <div class="tile__info">
+          <div>
+            <span class="tile__tag" data-i18n="bs_tag">Deployed · Live-Traffic · Supabase + Vercel</span>
+            <h2 class="tile__title" data-i18n="bs_title">SaaS Booking Platform</h2>
+          </div>
+        </div>
+      </a>
+
+      <!-- Sanifair — tall -->
+      <a href="sanifair.html" class="tile">
+        <div class="tile__visual">
+          <iframe src="Smart_Cabin_Monitor_Mockup.html?view=preview" loading="lazy" tabindex="-1"></iframe>
+        </div>
+        <span class="tile__arrow" data-i18n="tile_cta">Ansehen ↗</span>
+        <div class="tile__info">
+          <div>
+            <span class="tile__tag" data-i18n="sf_tag">IoT Konzept · 2026</span>
+            <h2 class="tile__title" data-i18n="sf_title">IoT Smart Cleaning: Intelligente Reinigungssteuerung</h2>
+          </div>
+        </div>
+      </a>
+
+      <!-- Automation -->
+      <a href="automation.html" class="tile">
+        <div class="tile__visual" id="flow-tile" style="background:#F2F0EC;"></div>
+        <span class="tile__arrow" data-i18n="tile_cta">Ansehen ↗</span>
+        <div class="tile__info">
+          <div>
+            <span class="tile__tag" data-i18n="wf_tag">AI Automation · 2026</span>
+            <h2 class="tile__title" data-i18n="wf_title">AI-Driven Workflow Automation</h2>
+          </div>
+        </div>
+      </a>
+
+      <!-- Community -->
+      <a href="community.html" class="tile tile--wide">
+        <div class="tile__visual">
+          <iframe src="https://ai-community-niedersachsen.de/" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" tabindex="-1"></iframe>
+        </div>
+        <span class="tile__arrow" data-i18n="tile_cta">Ansehen ↗</span>
+        <div class="tile__info">
+          <div>
+            <span class="tile__tag" data-i18n="cm_tag">Ecosystem Strategy &amp; Community Building · Okt 2024 bis heute</span>
+            <h2 class="tile__title" data-i18n-html="cm_title">Ecosystem Building: Die AI Community Niedersachsen</h2>
+          </div>
+        </div>
+      </a>
+
+
+    </div>
+  </main>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <p class="about__label" data-i18n="about_label">Über mich</p>
+    <div class="about__layout">
+
+      <!-- Photo -->
+      <div class="about__photo-wrap">
+        <img src="Viktor_komplett.jpeg" alt="Viktor Weber" class="about__photo">
+      </div>
+
+      <!-- Content -->
+      <div class="about__content">
+        <div class="about__text">
+          <p data-i18n="about_p1">Ich bin Viktor. Mein Fundament basiert auf internationalem Projektmanagement, tiefgehender Datenanalyse und starkem Enterprise-Produktmanagement bei Volkswagen. Heute verbinde ich diese Erfahrung mit hands-on AI: Ich baue keine Folien, ich baue Produkte.</p>
+          <p data-i18n="about_p2">Ich schließe die Lücke zwischen Strategie und Code, indem ich geschäftliche Ziele direkt in Technik übersetze. Mit der Claude API, MCP und n8n entwickle ich Prototypen und Automatisierungen, die sofort Mehrwert stiften.</p>
+          <p data-i18n="about_p3">Um technologisch immer einen Schritt voraus zu sein, teile ich meine Erkenntnisse regelmäßig als Speaker. In der von mir gegründeten AI Community Braunschweig bringe ich Menschen zusammen, um Wissen zu vermitteln und die Brücke zwischen Theorie und echter Produktion zu schlagen.</p>
+        </div>
+
+        <div class="about__tags">
+          <span class="about__tag">Claude API</span>
+          <span class="about__tag">MCP</span>
+          <span class="about__tag">n8n</span>
+          <span class="about__tag">AI Automation</span>
+          <span class="about__tag">Product Strategy</span>
+          <span class="about__tag">MVP Building</span>
+          <span class="about__tag">Prompt Engineering</span>
+          <span class="about__tag">IoT</span>
+        </div>
+
+        <div class="about__stats">
+          <div class="stat">
+            <div class="stat__row"><span class="stat__n" data-count="19">0</span><span class="stat__u">+</span></div>
+            <span class="stat__l" data-i18n="stat_l1">Jahre Erfahrung</span>
+          </div>
+          <div class="stat">
+            <div class="stat__row"><span class="stat__u stat__u--pre">+</span><span class="stat__n" data-count="35">0</span><span class="stat__u">%</span></div>
+            <span class="stat__l" data-i18n="stat_l2">ROI gesteigert</span>
+          </div>
+          <div class="stat">
+            <div class="stat__row"><span class="stat__n">&lt;10</span><span class="stat__u"> Min</span></div>
+            <span class="stat__l" data-i18n="stat_l3">Idee zu MVP</span>
+          </div>
+          <div class="stat">
+            <div class="stat__row"><span class="stat__n" data-count="290">0</span><span class="stat__u">+</span></div>
+            <span class="stat__l" data-i18n="stat_l4">Community Mitglieder</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <p class="contact__label" data-i18n="c_label">Kontakt</p>
+    <h2 class="contact__headline" data-i18n="c_headline">Lass uns reden.</h2>
+    <p class="contact__sub" data-i18n="c_sub">Offen für neue Rollen und spannende Projekte.</p>
+
+    <div class="contact__grid">
+
+      <!-- Email card -->
+      <div class="ccard">
+        <div class="ccard__header">
+          <div>
+            <div class="ccard__name">Viktor Weber</div>
+            <div class="ccard__handle">viktor.weber@startmail.com</div>
+          </div>
+          <div class="ccard__appicon ccard__appicon--mail">✉️</div>
+        </div>
+        <div class="ccard__compose">
+          <div class="ccard__compose-row">
+            <span class="ccard__compose-lbl" data-i18n="c_compose_to">An</span>
+            <span class="ccard__compose-val">viktor.weber@startmail.com</span>
+          </div>
+          <div class="ccard__compose-divider"></div>
+          <div class="ccard__compose-row">
+            <span class="ccard__compose-lbl" data-i18n="c_compose_subject">Betreff</span>
+            <span class="ccard__compose-val" data-i18n="c_subject_val">Lass uns reden</span>
+          </div>
+          <div class="ccard__compose-divider"></div>
+          <div class="ccard__compose-body" data-i18n="c_compose_body">Hallo Viktor, …</div>
+        </div>
+        <a href="mailto:viktor.weber@startmail.com" class="ccard__btn" data-i18n="c_btn_email">E-Mail schreiben ↗</a>
+      </div>
+
+      <!-- LinkedIn card -->
+      <div class="ccard">
+        <div class="ccard__header">
+          <div class="ccard__avatar-wrap">
+            <img src="Design ohne Titel(3).png" alt="Viktor Weber" class="ccard__avatar ccard__avatar--img">
+            <div>
+              <div class="ccard__name">Viktor Weber</div>
+            </div>
+          </div>
+          <div class="ccard__appicon ccard__appicon--li">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="#fff"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+        </div>
+        <p class="ccard__bio">AI Product Leader | Product Strategy &amp; AI Automation | n8n · Claude API · MCP | Founder &amp; Lead AI Community Braunschweig</p>
+        <a href="https://www.linkedin.com/in/viktor-weber/" target="_blank" rel="noopener" class="ccard__btn" data-i18n="c_btn_linkedin">Vernetzen ↗</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="detail-footer-new" style="justify-items:center; grid-template-columns:1fr;">
+    <span class="detail-footer-new__copy">© 2026 Viktor Weber</span>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script src="main.js"></script>
+  <script>
+    const _flowNodes = [
+      { icon: '📬', label: 'E-Mail', color: '#e8f4e8', border: '#a8d4a8' },
+      { icon: '🤖', label: 'GPT-4o', color: '#f4e8f4', border: '#d4a8d4' },
+      { icon: '🎯', label: 'Filter', color: '#f4f0e8', border: '#d4c4a8' },
+      { icon: '📱', label: 'Telegram', color: '#e8f4f0', border: '#a8d4c4' },
+      { icon: '📚', label: 'Notion', color: '#e8e8f4', border: '#a8a8d4' },
+    ];
+    const _flowCaptions = {
+      de: 'Job Alert → KI-Analyse → Telegram → Notion',
+      en: 'Job Alert → AI Analysis → Telegram → Notion',
+    };
+    function buildFlowTile(lang) {
+      const el = document.getElementById('flow-tile');
+      if (!el) return;
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0;justify-content:center;flex-wrap:nowrap;">
+          ${_flowNodes.map((n, i) => `
+            <div style="display:flex;align-items:center;gap:0;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                <div style="width:72px;height:72px;border-radius:18px;background:${n.color};border:1.5px solid ${n.border};display:flex;align-items:center;justify-content:center;font-size:30px;">${n.icon}</div>
+                <span style="font-size:11px;color:rgba(0,0,0,0.4);font-family:Inter,sans-serif;font-weight:600;letter-spacing:0.02em;">${n.label}</span>
+              </div>
+              ${i < _flowNodes.length - 1 ? `<div style="width:28px;height:2px;background:linear-gradient(90deg,rgba(0,0,0,0.1),rgba(0,0,0,0.2));margin-bottom:22px;flex-shrink:0;"></div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div style="text-align:center;margin-top:18px;font-size:10px;color:rgba(0,0,0,0.25);font-family:Inter,sans-serif;letter-spacing:0.06em;text-transform:uppercase;">${_flowCaptions[lang] || _flowCaptions.de}</div>
+      `;
+    }
+    buildFlowTile(localStorage.getItem('portfolio_lang') || 'de');
+    window.addEventListener('langchange', e => buildFlowTile(e.detail));
+  </script>
+
+</body>
+</html>

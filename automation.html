@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Automation Workflow · Viktor Weber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- OG / Social Meta -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Job Automation Workflow · Viktor Weber" />
+  <meta property="og:description" content="Vollautomatisches Bewerbungssystem mit n8n, GPT-4o und Telegram. Von Jobalert bis fertigem Anschreiben in unter 60 Sekunden." />
+  <meta property="og:image"       content="social-preview.png" />
+  <meta property="og:url"         content="https://viktorweber.de/automation.html" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Job Automation Workflow · Viktor Weber" />
+  <meta name="twitter:description" content="Vollautomatisches Bewerbungssystem mit n8n, GPT-4o und Telegram. Unter 60 Sekunden vom Alert bis zum Anschreiben." />
+  <meta name="twitter:image"      content="social-preview.png" />
+  <link rel="icon" type="image/png" href="Design ohne Titel(3).png">
+  <link rel="apple-touch-icon" href="Design ohne Titel(3).png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Detail Nav ── */
+    .detail-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .detail-nav__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .detail-nav__back:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+    .detail-nav__back svg { width: 16px; height: 16px; }
+    .detail-nav__name {
+      font-family: var(--display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 7px 16px;
+    }
+
+    /* ── Hero ── */
+    .detail-hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-hero__tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .detail-hero__title {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.2vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 10px;
+    }
+    .detail-hero__sub {
+      font-size: 16px;
+      color: var(--ink-faint);
+    }
+
+    /* ── Body ── */
+    .detail-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-meta { display: flex; flex-direction: column; gap: 24px; }
+    .detail-meta__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .detail-meta__items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-meta__item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .detail-content__section { margin-bottom: 32px; }
+    .detail-content__section-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .detail-content__text {
+      font-size: 15px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+
+    /* ── Phase blocks ── */
+    .phase-section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .phase-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .phase-dot--idea       { background: var(--ink-faint); }
+    .phase-dot--mvp        { background: var(--accent); }
+    .phase-dot--production { background: #1A7A4A; }
+    .phase-dot--repeat     { background: #8B4FA8; }
+    .phase-word {
+      font-family: var(--display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .phase-word--idea       { color: var(--ink-faint); }
+    .phase-word--mvp        { color: var(--accent); }
+    .phase-word--production { color: #1A7A4A; }
+    .phase-word--repeat     { color: #8B4FA8; }
+    .phase-headline {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .phase-body {
+      font-size: 15px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 32px;
+    }
+
+    /* ── Problem stat ── */
+    .problem-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFF8E7;
+      border: 1px solid #F0DFA0;
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 28px;
+    }
+    .problem-stat__num {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #B8860B;
+    }
+    .problem-stat__text {
+      font-size: 15px;
+      color: #8B6914;
+      max-width: 260px;
+      line-height: 1.4;
+    }
+    .idea-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .idea-card {
+      background: #F2F0EC;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .idea-card__icon { font-size: 22px; margin-bottom: 10px; }
+    .idea-card__title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .idea-card__text { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+
+    /* ── Workflow diagram ── */
+    .workflow-block {
+      margin-bottom: 32px;
+    }
+    .workflow-block__title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 16px;
+    }
+    .flow-canvas {
+      background: #F2F0EC;
+      border-radius: 16px;
+      padding: 36px 24px 28px;
+      overflow-x: auto;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .flow-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      min-width: max-content;
+    }
+    .flow-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+    }
+    .flow-node__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: transform 0.2s;
+      position: relative;
+    }
+    .flow-node:hover .flow-node__icon { transform: translateY(-3px); }
+    .flow-node__icon--trigger  { background: #e8f4e8; border: 1.5px solid #a8d4a8; }
+    .flow-node__icon--process  { background: #e8e8f4; border: 1.5px solid #a8a8d4; }
+    .flow-node__icon--ai       { background: #f4e8f4; border: 1.5px solid #d4a8d4; }
+    .flow-node__icon--filter   { background: #f4f0e8; border: 1.5px solid #d4c4a8; }
+    .flow-node__icon--notify   { background: #e8f4f0; border: 1.5px solid #a8d4c4; }
+    .flow-node__icon--save     { background: #efefef; border: 1.5px solid #ccc; }
+    .flow-node__label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-align: center;
+      max-width: 64px;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+    .flow-arrow {
+      width: 32px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.2));
+      position: relative;
+      flex-shrink: 0;
+      margin-bottom: 20px;
+    }
+    .flow-arrow::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: rgba(0,0,0,0.2);
+    }
+    .flow-active .flow-node__icon {
+      box-shadow: 0 0 0 2px rgba(27,95,168,0.2), 0 0 16px rgba(27,95,168,0.15);
+    }
+
+    /* ── Interactive Workflow Demo ── */
+    .wf-demo {
+      border-radius: 16px;
+      overflow: visible;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.1);
+    }
+    .wf-tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      border-radius: 16px 16px 0 0;
+      overflow: hidden;
+    }
+    .wf-tab {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      background: none;
+      border: none;
+      padding: 14px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .wf-tab:hover { color: var(--ink-soft); }
+    .wf-tab--active { color: var(--ink); border-bottom-color: var(--accent); }
+
+    .wf-canvas {
+      background: #F8F6F2;
+      padding: 56px 24px 24px;
+      position: relative;
+      min-height: 340px;
+      border-radius: 0 0 16px 16px;
+    }
+    .wf-track {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .wf-track::-webkit-scrollbar { display: none; }
+
+    .wf-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .wf-node__box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: transform 0.25s, box-shadow 0.3s, border-color 0.3s;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      position: relative;
+    }
+    .wf-node__label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      text-align: center;
+      max-width: 68px;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+      transition: color 0.3s;
+    }
+    .wf-node--done .wf-node__box {
+      border-color: rgba(74,126,219,0.5);
+      background: rgba(74,126,219,0.12);
+    }
+    .wf-node--done .wf-node__label { color: var(--ink-soft); }
+    .wf-node--active .wf-node__box {
+      border-color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 0 0 3px rgba(27,95,168,0.15), 0 8px 24px rgba(27,95,168,0.15);
+    }
+    .wf-node--active .wf-node__label { color: var(--ink); font-weight: 700; }
+    .wf-node--telegram.wf-node--active .wf-node__box {
+      border-color: #2AABEE;
+      background: rgba(42,171,238,0.1);
+      box-shadow: 0 0 0 3px rgba(42,171,238,0.2), 0 8px 24px rgba(42,171,238,0.15);
+    }
+    .wf-node--notion.wf-node--active .wf-node__box {
+      border-color: var(--ink);
+      background: rgba(0,0,0,0.05);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .wf-arrow {
+      width: 28px;
+      height: 2px;
+      background: rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      margin-top: 27px;
+      position: relative;
+      transition: background 0.4s;
+    }
+    .wf-arrow::after {
+      content: '';
+      position: absolute;
+      right: -1px; top: -4px;
+      border: 5px solid transparent;
+      border-left-color: rgba(0,0,0,0.1);
+      transition: border-color 0.4s;
+    }
+    .wf-arrow--lit { background: rgba(27,95,168,0.4); }
+    .wf-arrow--lit::after { border-left-color: rgba(27,95,168,0.4); }
+
+    .wf-step-info {
+      margin-top: 20px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+    }
+    .wf-step-info__text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      transition: opacity 0.3s;
+    }
+
+    .wf-controls {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .wf-btn {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: #1B5FA8;
+      border: none;
+      border-radius: 999px;
+      padding: 9px 22px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .wf-btn:hover { background: #2468b8; transform: scale(1.03); }
+    .wf-btn:disabled { background: #ddd; color: rgba(0,0,0,0.3); cursor: default; transform: none; }
+    .wf-progress {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .wf-progress__bar {
+      height: 100%;
+      width: 0%;
+      background: #4A7EDB;
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Telegram popup ── */
+    .tg-popup {
+      width: 300px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      border: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+      transition: opacity 0.4s, transform 0.4s;
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .tg-popup--show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    .tg-popup__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .tg-popup__avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #2AABEE;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .tg-popup__name {
+      font-size: 13px; font-weight: 600; color: var(--ink);
+    }
+    .tg-popup__status {
+      font-size: 11px; color: var(--ink-faint);
+    }
+    .tg-bubble {
+      background: #E8F0FA;
+      border-radius: 12px 12px 12px 2px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .tg-popup__time {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    /* ── Popup row ── */
+    .wf-popup-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+      align-items: flex-start;
+      min-height: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.5s ease, margin-top 0.4s;
+    }
+    .wf-popup-row--show {
+      max-height: 400px;
+    }
+
+    /* ── Popup arrow ── */
+    .wf-popup-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--ink-faint);
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.4s 0.3s;
+      align-self: center;
+      padding: 0 4px;
+    }
+    .wf-popup-row--notion .wf-popup-arrow {
+      opacity: 1;
+    }
+
+    /* ── Notion popup ── */
+    .notion-popup {
+      width: 320px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+      transition: opacity 0.4s, transform 0.4s;
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .notion-popup--show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    .notion-popup__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #F7F7F5;
+      border-bottom: 1px solid #E8E5E0;
+      font-size: 12px;
+      color: #555;
+    }
+    .notion-popup__logo {
+      width: 20px; height: 20px;
+      background: #000;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .notion-popup__title { flex: 1; font-weight: 600; color: #333; }
+    .notion-popup__saved { font-size: 11px; color: #1A7A4A; font-weight: 600; }
+    .notion-popup__body { padding: 14px 16px; }
+    .notion-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .notion-row__key { color: #999; min-width: 90px; font-weight: 500; }
+    .notion-row__val { color: #0E0E0E; font-weight: 500; }
+    .notion-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .notion-badge--green { background: #DCFCE7; color: #166534; }
+    .notion-badge--blue  { background: #DBEAFE; color: #1E40AF; }
+
+    /* ── Production metrics ── */
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: stretch;
+    }
+    .prod-card {
+      background: #F2F0EC;
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .prod-card__val {
+      font-family: var(--display);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .prod-card__label {
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    /* ── Repeat scale cards ── */
+    .scale-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .scale-card {
+      background: rgba(139,79,168,0.06);
+      border: 1px solid rgba(139,79,168,0.18);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .scale-card__title { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+    .scale-card__text { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+
+    footer.detail-footer {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 40px 64px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--border);
+    }
+    footer.detail-footer a { color: var(--ink-faint); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .detail-body { grid-template-columns: 1fr; gap: 32px; }
+      .detail-nav, .detail-hero, .detail-body, .phase-section, footer.detail-footer { padding-left: 24px; padding-right: 24px; }
+      .idea-grid { grid-template-columns: 1fr; }
+      .prod-grid { grid-template-columns: 1fr 1fr; }
+      .scale-grid { grid-template-columns: 1fr; }
+    }
+    .highlights-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .highlights-list li {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+      padding-left: 20px;
+      position: relative;
+    }
+    .highlights-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .highlights-list li strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="detail-nav">
+    <div class="nav__pill">
+      <a href="index.html" class="detail-nav__back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+        <span data-i18n="back">Zurück</span>
+      </a>
+      <span class="detail-nav__name">Viktor Weber</span>
+      <button class="lang-toggle" id="langToggle">EN</button>
+    </div>
+  </nav>
+
+  <header class="detail-hero">
+    <p class="detail-hero__tag" data-i18n="wf_tag">AI Automation · 2026</p>
+    <h1 class="detail-hero__title" data-i18n-html="wf_title">AI-Driven Workflow Automation</h1>
+    <p class="detail-hero__sub" data-i18n="wf_sub">Eventgetriebene Prozessautomatisierung via n8n &amp; Model Context Protocol (MCP) &#8211; Skalierbare Infrastruktur zur Eliminierung manueller Datensichtung.</p>
+  </header>
+
+  <div class="detail-body">
+    <aside class="detail-meta">
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_role">Meine Rolle</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">AI Architect</span>
+          <span class="detail-meta__item">Workflow Engineer</span>
+          <span class="detail-meta__item">Prompt Design</span>
+        </div>
+      </div>
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_stack">Stack</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">n8n</span>
+          <span class="detail-meta__item">GPT-4o</span>
+          <span class="detail-meta__item">Claude</span>
+          <span class="detail-meta__item">Telegram</span>
+          <span class="detail-meta__item">Notion</span>
+          <span class="detail-meta__item">IMAP</span>
+        </div>
+      </div>
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_time">Zeitraum</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">2026</span>
+        </div>
+      </div>
+      <div>
+        <p class="detail-meta__label" data-i18n="meta_status">Status</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item" style="color:#1A7A4A; border-color:rgba(26,122,74,0.3); background:rgba(26,122,74,0.06);">● Live</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="detail-content">
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="wf_sec1">Beschreibung</p>
+        <p class="detail-content__text" data-i18n="wf_text1">
+          Konzeption und Implementierung einer skalierbaren, eventgetriebenen Automatisierungs-Infrastruktur auf Basis von n8n. Das System demonstriert die nahtlose Integration moderner Large Language Models (LLMs) in bestehende Systemlandschaften über das Model Context Protocol (MCP). Repetitive, fehleranfällige Prozesse der manuellen Datensichtung und -bewertung werden vollständig autonomisiert: von der API-gestützten Datenbeschaffung über eine KI-basierte Relevanz-Analyse bis hin zur strukturierten Bereitstellung im lokalen Workspace.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="wf_sec2">Highlights</p>
+        <div data-i18n-html="wf_text2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDEA -->
+  <section class="phase-section" id="idea">
+    <div class="phase-label">
+      <span class="phase-dot phase-dot--idea"></span>
+      <span class="phase-word phase-word--idea">Idea</span>
+    </div>
+    <h2 class="phase-headline" data-i18n-html="wf_idea_headline">Bewerbungen schreiben<br>kostet mehr Zeit als der Job selbst.</h2>
+    <p class="phase-body" data-i18n="wf_idea_body">
+      Jede Stelle braucht ein individuelles Anschreiben, einen angepassten Lebenslauf,
+      und das alles für Hunderte von Ausschreibungen. 80% der Zeit geht für Recherche
+      und Umformulierungen drauf, nicht für die eigentliche Stärke.
+    </p>
+    <div class="problem-stat">
+      <span class="problem-stat__num">80%</span>
+      <span class="problem-stat__text" data-i18n="wf_idea_stat">der Bewerbungszeit entfallen auf manuelle Anpassungen</span>
+    </div>
+    <div class="idea-grid">
+      <div class="idea-card">
+        <div class="idea-card__icon">📬</div>
+        <div class="idea-card__title" data-i18n="wf_idea_t1">Problem</div>
+        <div class="idea-card__text" data-i18n="wf_idea_c1">Jobalerts kommen täglich, aber manuelles Screenen kostet zu viel Zeit.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card__icon">🤖</div>
+        <div class="idea-card__title" data-i18n="wf_idea_t2">Ansatz</div>
+        <div class="idea-card__text" data-i18n="wf_idea_c2">KI bewertet Relevanz automatisch, nur passende Jobs landen im Postfach.</div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-card__icon">⚡</div>
+        <div class="idea-card__title" data-i18n="wf_idea_t3">Ziel</div>
+        <div class="idea-card__text" data-i18n="wf_idea_c3">Von Jobalert bis fertigem Anschreiben in unter 60 Sekunden.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MVP -->
+  <section class="phase-section" id="mvp">
+    <div class="phase-label">
+      <span class="phase-dot phase-dot--mvp"></span>
+      <span class="phase-word phase-word--mvp">MVP</span>
+    </div>
+    <h2 class="phase-headline" data-i18n-html="wf_mvp_headline">Zwei Workflows,<br>ein vollständiges System.</h2>
+    <p class="phase-body" data-i18n="wf_mvp_body">
+      Workflow 1 überwacht das E-Mail-Postfach, filtert nach Relevanz und sendet Alerts per Telegram.
+      Workflow 2 nimmt eine Stellenbeschreibung via Telegram entgegen und generiert ein komplettes
+      Bewerbungspaket, das direkt in Notion landet.
+    </p>
+
+    <!-- Interactive Workflow Demo -->
+    <div class="wf-demo" id="wfDemo">
+
+      <!-- Tab switcher -->
+      <div class="wf-tabs">
+        <button class="wf-tab wf-tab--active" data-wf="alerts" data-i18n="wf_tab1">Workflow 1 · Job Alerts</button>
+        <button class="wf-tab" data-wf="assistant" data-i18n="wf_tab2">Workflow 2 · Bewerbungs-Assistent</button>
+      </div>
+
+      <!-- Canvas -->
+      <div class="wf-canvas">
+
+        <!-- Nodes row -->
+        <div class="wf-track" id="wfTrack"></div>
+
+        <!-- Step description -->
+        <div class="wf-step-info" id="wfStepInfo">
+          <div class="wf-step-info__text" id="wfStepText" data-i18n="wf_start_hint">Drücke Start um den Workflow zu simulieren.</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="wf-controls">
+          <button class="wf-btn" id="wfStartBtn" data-i18n="wf_btn_start">▶ Starten</button>
+          <div class="wf-progress" id="wfProgress"><div class="wf-progress__bar" id="wfProgressBar"></div></div>
+        </div>
+
+        <!-- Popup row (inline, no absolute overlap) -->
+        <div class="wf-popup-row" id="wfPopupRow">
+
+          <!-- Telegram popup -->
+          <div class="tg-popup" id="tgPopup">
+
+            <div class="tg-popup__header">
+              <div class="tg-popup__avatar">🤖</div>
+              <div>
+                <div class="tg-popup__name">Job Alert Bot</div>
+                <div class="tg-popup__status">Viktor Weber</div>
+              </div>
+            </div>
+            <div class="tg-bubble" id="tgBubble"></div>
+            <div class="tg-popup__time" id="tgTime"></div>
+          </div>
+
+          <!-- Arrow between popups -->
+          <div class="wf-popup-arrow" id="wfPopupArrow">→</div>
+
+          <!-- Notion popup -->
+          <div class="notion-popup" id="notionPopup">
+            <div class="notion-popup__header">
+              <span class="notion-popup__logo">N</span>
+              <span class="notion-popup__title">Notion · Job Tracker</span>
+              <span class="notion-popup__saved">✓ Gespeichert</span>
+            </div>
+            <div class="notion-popup__body" id="notionBody"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTION -->
+  <section class="phase-section" id="production">
+    <div class="phase-label">
+      <span class="phase-dot phase-dot--production"></span>
+      <span class="phase-word phase-word--production">Production</span>
+    </div>
+    <h2 class="phase-headline" data-i18n-html="wf_prod_headline">Beide Workflows laufen<br>täglich im Produktivbetrieb.</h2>
+    <p class="phase-body" data-i18n="wf_prod_body">
+      Seit Mai 2026 aktiv. Der Job-Alert-Workflow filtert täglich eingehende Jobalerts
+      und schickt nur relevante Treffer weiter. Der Bewerbungs-Assistent hat bereits
+      mehrere vollständige Bewerbungspakete generiert.
+    </p>
+    <div class="prod-grid">
+      <div class="prod-card">
+        <div class="prod-card__val">&lt; 60s</div>
+        <div class="prod-card__label" data-i18n="wf_prod_label1">Von Jobalert bis fertigem Anschreiben</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card__val" data-i18n-html="wf_prod_val2">Von 40<br><span style="font-size:20px;color:var(--ink-soft)">auf 3</span></div>
+        <div class="prod-card__label" data-i18n="wf_prod_label2">Jobalerts täglich, nur noch Relevantes</div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card__val">&lt; 2€</div>
+        <div class="prod-card__label" data-i18n="wf_prod_label3">Kosten pro Monat (GPT-4o-mini)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPEAT -->
+  <section class="phase-section" id="repeat">
+    <div class="phase-label">
+      <span class="phase-dot phase-dot--repeat"></span>
+      <span class="phase-word phase-word--repeat">Repeat</span>
+    </div>
+    <h2 class="phase-headline" data-i18n-html="wf_repeat_headline">Bereit für<br>mehrere Nutzer.</h2>
+    <p class="phase-body" data-i18n="wf_repeat_body">
+      Der Kern ist template-fähig, jedes Profil bekommt sein eigenes Master-CV in Notion
+      und eine eigene Telegram-Verbindung. Eine neue Instanz ist in Minuten eingerichtet.
+    </p>
+    <div class="scale-grid">
+      <div class="scale-card">
+        <div class="idea-card__icon">🏢</div>
+        <div class="scale-card__title" data-i18n="wf_scale_t1">Recruiting-Agenturen</div>
+        <div class="scale-card__text" data-i18n="wf_scale_c1">Kandidatenprofile automatisch auf Stellen matchen und Anschreiben in Sekunden generieren.</div>
+      </div>
+      <div class="scale-card">
+        <div class="idea-card__icon">👥</div>
+        <div class="scale-card__title" data-i18n="wf_scale_t2">HR-Teams</div>
+        <div class="scale-card__text" data-i18n="wf_scale_c2">Eingehende Bewerbungen automatisch vorsortieren und zusammenfassen.</div>
+      </div>
+      <div class="scale-card">
+        <div class="idea-card__icon">💻</div>
+        <div class="scale-card__title" data-i18n="wf_scale_t3">Freelancer-Plattformen</div>
+        <div class="scale-card__text" data-i18n="wf_scale_c3">Projektausschreibungen monitoren, Angebote automatisch auf Anforderungen anpassen.</div>
+      </div>
+      <div class="scale-card">
+        <div class="idea-card__icon">🎯</div>
+        <div class="scale-card__title" data-i18n="wf_scale_t4">Karriere-Coaching</div>
+        <div class="scale-card__text" data-i18n="wf_scale_c4">Als Service für Kunden anbieten: eigenes Profil einrichten, Workflow läuft autonom.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="detail-footer-new">
+    <a href="index.html" class="detail-footer-new__back" data-i18n="back_portfolio">← Zurück zum Portfolio</a>
+    <span class="detail-footer-new__copy">© 2026 Viktor Weber</span>
+    <div></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script>
+  const WORKFLOWS = {
+    de: {
+      alerts: {
+        nodes: [
+          { icon: '📬', label: 'E-Mail\nTrigger',      cls: '',                  desc: '📬 Neuer Jobalert landet im Postfach. Der IMAP-Trigger schlägt sofort an.' },
+          { icon: '🧹', label: 'HTML\nbereinigen',     cls: '',                  desc: '🧹 HTML-Tags werden entfernt, der reine Anzeigentext wird extrahiert.' },
+          { icon: '🤖', label: 'GPT-4o-mini\nAnalyse', cls: '',                  desc: '🤖 GPT-4o-mini analysiert die Stelle und vergibt einen Relevanz-Score von 1–10.' },
+          { icon: '⚙️', label: 'Output\nparsen',       cls: '',                  desc: '⚙️ Score, Titel, Unternehmen und Standort werden aus der KI-Antwort extrahiert.' },
+          { icon: '🎯', label: 'Filter\nScore ≥ 7',    cls: '',                  desc: '🎯 Nur Jobs mit Score ≥ 7 kommen durch. Niedrig-relevante werden verworfen.' },
+          { icon: '📱', label: 'Telegram\nAlert',      cls: 'wf-node--telegram', desc: '📱 Sofort-Benachrichtigung geht raus, mit Titel, Score und direktem Link.' },
+          { icon: '📚', label: 'Notion\nDB',           cls: 'wf-node--notion',   desc: '📚 Der Job wird mit allen Details in der Notion-Datenbank gespeichert.' },
+        ],
+        telegram: `🎯 <b>Neuer Job Alert!</b>\n\nSenior Product Manager\nVolkswagen AG · Wolfsburg\n\n⭐ Score: <b>9 / 10</b>\n✅ Remote möglich\n💶 85.000 – 100.000 €\n\n🔗 Zur Notion-Seite`,
+        notion: [
+          { key: 'Stelle',      val: 'Senior Product Manager' },
+          { key: 'Unternehmen', val: 'Volkswagen AG' },
+          { key: 'Standort',    val: 'Wolfsburg (Remote)' },
+          { key: 'Score',       val: '9 / 10', badge: 'green' },
+          { key: 'Gehalt',      val: '85k – 100k €' },
+          { key: 'Status',      val: 'Neu', badge: 'blue' },
+          { key: 'Datum',       val: '09.06.2026' },
+        ],
+      },
+      assistant: {
+        nodes: [
+          { icon: '✉️', label: 'Telegram\nEingabe',    cls: 'wf-node--telegram', desc: '✉️ Du schickst die Stellenanzeige als Textnachricht an den Bot.' },
+          { icon: '📄', label: 'Master-CV\naus Notion', cls: '',                 desc: '📄 Das Master-CV wird direkt aus deiner Notion-Seite geladen.' },
+          { icon: '✍️', label: 'Anschreiben\nVorlage', cls: '',                  desc: '✍️ Die Muster-Vorlage für das Anschreiben wird ebenfalls aus Notion geholt.' },
+          { icon: '📋', label: 'CV-Layout\nlesen',     cls: '',                  desc: '📋 Das gewünschte Layout und Format wird als dritter Kontext-Baustein geladen.' },
+          { icon: '🔨', label: 'Kontext\naufbauen',    cls: '',                  desc: '🔨 Stellenanzeige + CV + Anschreiben werden zu einem strukturierten Prompt zusammengefügt.' },
+          { icon: '🤖', label: 'GPT-4o\ngeneriert',    cls: '',                  desc: '🤖 GPT-4o erstellt ein stellenspezifisches Anschreiben und passt den CV-Text an.' },
+          { icon: '🏗️', label: 'Notion\nSeite',        cls: 'wf-node--notion',   desc: '🏗️ Eine neue Notion-Seite wird erstellt, mit Anschreiben, CV-Anpassungen und Notizen.' },
+          { icon: '📱', label: 'Telegram\nLink',       cls: 'wf-node--telegram', desc: '📱 Du bekommst den direkten Notion-Link zurück, fertig zum Kopieren und Absenden.' },
+        ],
+        telegram: `✅ <b>Bewerbungspaket fertig!</b>\n\nHead of Product · Siemens AG\n\n📝 Anschreiben angepasst\n📄 CV-Stichpunkte optimiert\n\n🔗 Notion öffnen`,
+        notion: [
+          { key: 'Stelle',       val: 'Head of Product' },
+          { key: 'Unternehmen',  val: 'Siemens AG' },
+          { key: 'Anschreiben',  val: '✓ Generiert', badge: 'green' },
+          { key: 'CV-Anpassung', val: '✓ Generiert', badge: 'green' },
+          { key: 'Status',       val: 'Bereit', badge: 'blue' },
+          { key: 'Erstellt',     val: '09.06.2026' },
+        ],
+      },
+    },
+    en: {
+      alerts: {
+        nodes: [
+          { icon: '📬', label: 'Email\nTrigger',        cls: '',                  desc: '📬 A new job alert arrives in the inbox. The IMAP trigger fires immediately.' },
+          { icon: '🧹', label: 'Clean\nHTML',           cls: '',                  desc: '🧹 HTML tags are removed, the clean job ad text is extracted.' },
+          { icon: '🤖', label: 'GPT-4o-mini\nAnalysis', cls: '',                  desc: '🤖 GPT-4o-mini analyses the position and assigns a relevance score from 1–10.' },
+          { icon: '⚙️', label: 'Parse\nOutput',         cls: '',                  desc: '⚙️ Score, title, company and location are extracted from the AI response.' },
+          { icon: '🎯', label: 'Filter\nScore ≥ 7',     cls: '',                  desc: '🎯 Only jobs with score ≥ 7 pass. Low-relevance ones are discarded.' },
+          { icon: '📱', label: 'Telegram\nAlert',       cls: 'wf-node--telegram', desc: '📱 Instant notification sent with title, score and direct link.' },
+          { icon: '📚', label: 'Notion\nDB',            cls: 'wf-node--notion',   desc: '📚 The job is saved with all details in the Notion database.' },
+        ],
+        telegram: `🎯 <b>New Job Alert!</b>\n\nSenior Product Manager\nVolkswagen AG · Wolfsburg\n\n⭐ Score: <b>9 / 10</b>\n✅ Remote possible\n💶 85,000 – 100,000 €\n\n🔗 Open in Notion`,
+        notion: [
+          { key: 'Position', val: 'Senior Product Manager' },
+          { key: 'Company',  val: 'Volkswagen AG' },
+          { key: 'Location', val: 'Wolfsburg (Remote)' },
+          { key: 'Score',    val: '9 / 10', badge: 'green' },
+          { key: 'Salary',   val: '85k – 100k €' },
+          { key: 'Status',   val: 'New', badge: 'blue' },
+          { key: 'Date',     val: '09.06.2026' },
+        ],
+      },
+      assistant: {
+        nodes: [
+          { icon: '✉️', label: 'Telegram\nInput',      cls: 'wf-node--telegram', desc: '✉️ You send the job listing as a text message to the bot.' },
+          { icon: '📄', label: 'Master CV\nfrom Notion', cls: '',                desc: '📄 Your master CV is loaded directly from your Notion page.' },
+          { icon: '✍️', label: 'Cover Letter\nTemplate', cls: '',                desc: '✍️ The cover letter template is also fetched from Notion.' },
+          { icon: '📋', label: 'Read CV\nLayout',      cls: '',                  desc: '📋 The desired layout and format is loaded as a third context element.' },
+          { icon: '🔨', label: 'Build\nContext',       cls: '',                  desc: '🔨 Job listing + CV + cover letter are merged into a structured prompt.' },
+          { icon: '🤖', label: 'GPT-4o\ngenerates',   cls: '',                  desc: '🤖 GPT-4o creates a position-specific cover letter and adapts the CV text.' },
+          { icon: '🏗️', label: 'Notion\nPage',         cls: 'wf-node--notion',   desc: '🏗️ A new Notion page is created with cover letter, CV adjustments and notes.' },
+          { icon: '📱', label: 'Telegram\nLink',       cls: 'wf-node--telegram', desc: '📱 You receive the direct Notion link back, ready to copy and send.' },
+        ],
+        telegram: `✅ <b>Application package ready!</b>\n\nHead of Product · Siemens AG\n\n📝 Cover letter adapted\n📄 CV bullet points optimised\n\n🔗 Open in Notion`,
+        notion: [
+          { key: 'Position',     val: 'Head of Product' },
+          { key: 'Company',      val: 'Siemens AG' },
+          { key: 'Cover Letter', val: '✓ Generated', badge: 'green' },
+          { key: 'CV Adaptation',val: '✓ Generated', badge: 'green' },
+          { key: 'Status',       val: 'Ready', badge: 'blue' },
+          { key: 'Created',      val: '09.06.2026' },
+        ],
+      },
+    },
+  };
+
+  let currentWf = 'alerts';
+  let running = false;
+  let step = -1;
+
+  const track     = document.getElementById('wfTrack');
+  const stepText  = document.getElementById('wfStepText');
+  const startBtn  = document.getElementById('wfStartBtn');
+  const progressBar = document.getElementById('wfProgressBar');
+  const tgPopup    = document.getElementById('tgPopup');
+  const tgBubble   = document.getElementById('tgBubble');
+  const tgTime     = document.getElementById('tgTime');
+  const notionPopup  = document.getElementById('notionPopup');
+  const notionBody   = document.getElementById('notionBody');
+  const popupRow     = document.getElementById('wfPopupRow');
+
+  function buildTrack(wfKey) {
+    const wf = WORKFLOWS[currentLang][wfKey];
+    track.innerHTML = '';
+    wf.nodes.forEach((n, i) => {
+      const node = document.createElement('div');
+      node.className = 'wf-node ' + (n.cls || '');
+      node.id = 'wfNode' + i;
+      node.innerHTML = `<div class="wf-node__box">${n.icon}</div><div class="wf-node__label">${n.label.replace('\n','<br>')}</div>`;
+      track.appendChild(node);
+      if (i < wf.nodes.length - 1) {
+        const arr = document.createElement('div');
+        arr.className = 'wf-arrow';
+        arr.id = 'wfArrow' + i;
+        track.appendChild(arr);
+      }
+    });
+  }
+
+  function resetDemo() {
+    running = false;
+    step = -1;
+    startBtn.disabled = false;
+    startBtn.textContent = translations[currentLang].wf_btn_start;
+    progressBar.style.width = '0%';
+    stepText.textContent = translations[currentLang].wf_start_hint;
+    tgPopup.classList.remove('tg-popup--show');
+    notionPopup.classList.remove('notion-popup--show');
+    popupRow.classList.remove('wf-popup-row--show', 'wf-popup-row--notion');
+    document.querySelectorAll('.wf-node').forEach(n => {
+      n.classList.remove('wf-node--active', 'wf-node--done');
+    });
+    document.querySelectorAll('.wf-arrow').forEach(a => a.classList.remove('wf-arrow--lit'));
+  }
+
+  async function runDemo() {
+    if (running) { resetDemo(); buildTrack(currentWf); return; }
+    running = true;
+    startBtn.textContent = translations[currentLang].wf_btn_reset;
+    const wf = WORKFLOWS[currentLang][currentWf];
+    const total = wf.nodes.length;
+
+    for (let i = 0; i < total; i++) {
+      if (!running) break;
+      // mark previous done
+      if (i > 0) {
+        document.getElementById('wfNode' + (i-1)).classList.remove('wf-node--active');
+        document.getElementById('wfNode' + (i-1)).classList.add('wf-node--done');
+        const prevArrow = document.getElementById('wfArrow' + (i-1));
+        if (prevArrow) prevArrow.classList.add('wf-arrow--lit');
+      }
+      // activate current
+      const nodeEl = document.getElementById('wfNode' + i);
+      nodeEl.classList.add('wf-node--active');
+      stepText.style.opacity = '0';
+      await sleep(120);
+      stepText.textContent = wf.nodes[i].desc;
+      stepText.style.opacity = '1';
+      progressBar.style.width = ((i + 1) / total * 100) + '%';
+
+      // Telegram popup at 2nd-to-last node
+      if (i === total - 2) {
+        await sleep(900);
+        tgBubble.innerHTML = wf.telegram.replace(/\n/g,'<br>').replace(/<b>/g,'<strong>').replace(/<\/b>/g,'<\/strong>');
+        const now = new Date();
+        tgTime.textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+        popupRow.classList.add('wf-popup-row--show');
+        tgPopup.classList.add('tg-popup--show');
+        await sleep(1400);
+      } else if (i === total - 1) {
+        // Last node — Notion popup appears alongside Telegram (both visible)
+        nodeEl.classList.remove('wf-node--active');
+        nodeEl.classList.add('wf-node--done');
+        await sleep(600);
+        notionBody.innerHTML = wf.notion.map(r => `
+          <div class="notion-row">
+            <span class="notion-row__key">${r.key}</span>
+            <span class="notion-row__val">${r.badge
+              ? `<span class="notion-badge notion-badge--${r.badge}">${r.val}</span>`
+              : r.val}</span>
+          </div>`).join('');
+        popupRow.classList.add('wf-popup-row--notion');
+        notionPopup.classList.add('notion-popup--show');
+        stepText.textContent = translations[currentLang].wf_done_text;
+        progressBar.style.width = '100%';
+        break;
+      } else {
+        await sleep(900);
+      }
+    }
+    running = false;
+    startBtn.textContent = translations[currentLang].wf_btn_replay;
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Tab switching
+  document.querySelectorAll('.wf-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('wf-tab--active'));
+      tab.classList.add('wf-tab--active');
+      currentWf = tab.dataset.wf;
+      resetDemo();
+      buildTrack(currentWf);
+    });
+  });
+
+  startBtn.addEventListener('click', runDemo);
+
+  // Rebuild when language changes
+  window.addEventListener('langchange', () => {
+    resetDemo();
+    buildTrack(currentWf);
+  });
+
+  // Init
+  buildTrack(currentWf);
+  </script>
+</body>
+</html>

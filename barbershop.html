@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barbershop Booking System, Viktor Weber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- OG / Social Meta -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Barbershop Booking System · Viktor Weber" />
+  <meta property="og:description" content="Vollständiges Online-Buchungssystem für einen Barbershop, selbst entwickelt, ohne Framework. Passwortloser Login, Echtzeit-Verfügbarkeit, deployed auf Vercel." />
+  <meta property="og:image"       content="social-preview.png" />
+  <meta property="og:url"         content="https://viktorweber.de/barbershop.html" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="Barbershop Booking System · Viktor Weber" />
+  <meta name="twitter:description" content="Vollständiges Online-Buchungssystem, selbst entwickelt, ohne Framework. Deployed auf Vercel." />
+  <meta name="twitter:image"      content="social-preview.png" />
+  <link rel="icon" type="image/png" href="Design ohne Titel(3).png">
+  <link rel="apple-touch-icon" href="Design ohne Titel(3).png">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Project Detail Page ── */
+    .detail-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .detail-nav__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .detail-nav__back:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+    .detail-nav__back svg { width: 16px; height: 16px; }
+    .detail-nav__name {
+      font-family: var(--display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 7px 16px;
+    }
+
+    .detail-hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 48px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 48px;
+    }
+    .detail-hero__tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow:
+        0 1px 12px rgba(0,0,0,0.07),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .detail-hero__title {
+      font-family: var(--display);
+      font-size: clamp(24px, 3.2vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 10px;
+    }
+    .detail-hero__sub {
+      font-size: 16px;
+      color: var(--ink-faint);
+    }
+
+    .detail-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-meta { display: flex; flex-direction: column; gap: 24px; }
+    .detail-meta__group {}
+    .detail-meta__label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .detail-meta__items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .detail-meta__item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+
+    .detail-content {}
+    .detail-content__section { margin-bottom: 32px; }
+    .detail-content__section-label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .detail-content__text {
+      font-size: 16px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+    .detail-content__metrics {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .detail-content__metric {
+      background: #F2F0EC;
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .detail-content__metric-val {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .detail-content__metric-label {
+      font-size: 11px;
+      color: var(--ink-faint);
+      margin-top: 2px;
+    }
+    .detail-content__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      background: #F2F0EC;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-decoration: none;
+      margin-top: 24px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .detail-content__cta:hover { background: #E8E5DF; border-color: #CCC9C3; }
+
+    /* ── Preview grid ── */
+    .detail-preview {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 40px 80px;
+    }
+    .detail-preview__label {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(27,95,168,0.08);
+      border: 1px solid rgba(27,95,168,0.18);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+    .preview-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin-bottom: 20px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .preview-card {
+      background: #F2F0EC;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+      position: relative;
+    }
+    .preview-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    }
+    .preview-card:active {
+      transform: translateY(-1px) scale(0.99);
+    }
+    .preview-card--wide {
+      grid-column: span 2;
+    }
+    .preview-card__inner {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .preview-card--iframe {
+      height: 480px;
+    }
+    .preview-card--iframe .preview-card__inner {
+      width: 100%;
+      height: 100%;
+    }
+    .preview-card__label {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    .stack-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .stack-pill {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(27, 95, 168, 0.08);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .detail-nav { padding: 20px 24px; }
+      .detail-hero, .detail-body, .detail-preview { padding-left: 24px; padding-right: 24px; }
+      .detail-body { grid-template-columns: 1fr; gap: 40px; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .preview-card--wide { grid-column: span 1; }
+      .preview-card--iframe { height: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="detail-nav">
+    <div class="nav__pill">
+      <a href="index.html" class="detail-nav__back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+        <span data-i18n="back">Zurück</span>
+      </a>
+      <span class="detail-nav__name">Viktor Weber</span>
+      <button class="lang-toggle" id="langToggle">EN</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="detail-hero">
+    <p class="detail-hero__tag" data-i18n="bs_tag">Fullstack Web App · 2026</p>
+    <h1 class="detail-hero__title" data-i18n="bs_title">SaaS Booking Platform für Kleinunternehmen & Dienstleister</h1>
+    <p class="detail-hero__sub" data-i18n="bs_sub">Ein frameworkloses, DSGVO-konformes Echtzeit-Buchungssystem (Produktionsreifes MVP) – konzipiert nach realen Praxisanforderungen.</p>
+  </header>
+
+  <!-- BODY: Meta + Content -->
+  <div class="detail-body">
+
+    <aside class="detail-meta">
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_role">Meine Rolle</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item" data-i18n="bs_role1">Produktkonzeption</span>
+          <span class="detail-meta__item">Frontend Development</span>
+          <span class="detail-meta__item">Backend Integration</span>
+          <span class="detail-meta__item">Deployment</span>
+        </div>
+      </div>
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_stack">Stack</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">HTML / CSS / JS</span>
+          <span class="detail-meta__item">Supabase</span>
+          <span class="detail-meta__item">Resend</span>
+          <span class="detail-meta__item">Sentry</span>
+          <span class="detail-meta__item">Vercel</span>
+        </div>
+      </div>
+      <div class="detail-meta__group">
+        <p class="detail-meta__label" data-i18n="meta_time">Zeitraum</p>
+        <div class="detail-meta__items">
+          <span class="detail-meta__item">2026</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="detail-content">
+      <div class="detail-content__section">
+        <p class="detail-content__section-label" data-i18n="bs_sec1">Beschreibung</p>
+        <p class="detail-content__text" data-i18n="bs_text1">
+          Entwicklung eines voll funktionsfähigen, produktionsreifen MVPs für ein Online-Buchungssystem im Dienstleistungsgewerbe (Konzept-Case-Study: Barbershop). Das System wurde von Grund auf so architektiert, dass es reale geschäftliche Herausforderungen löst und sofort in den Live-Betrieb gehen könnte. Es vereint maximale Performance durch Vanilla JS mit einer modernen Serverless-Infrastruktur. Neben der automatisierten Online-Terminvergabe inklusive E-Mail-OTP (Magic Links) wurde ein Echtzeit-Admin-Dashboard für administrative Live-Alerts und die manuelle Erfassung von Telefon-Buchungen implementiert.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;margin-right:6px;flex-shrink:0"><path d="M10 2L3 5.5V10c0 3.2 2.8 5.8 7 7 4.2-1.2 7-3.8 7-7V5.5L10 2z"/><polyline points="7,10 9.5,12.5 13.5,8"/></svg>
+          <span data-i18n="bs_hl1_label">Stornierungsschutz &amp; Admin-Alltag</span>
+        </p>
+        <p class="detail-content__text" data-i18n="bs_hl1_text">
+          Integrierter Stornierungsschutz bei Absagen unter 24 Stunden mittels automatisiertem Realtime-Freigabeprozess (Admin-Entscheidung via Live-Banner) sowie nahtlose manuelle Erfassung von Telefon-Buchungen direkt im Dashboard.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;margin-right:6px;flex-shrink:0"><rect x="4" y="9" width="12" height="9" rx="1.5"/><path d="M7 9V6.5a3 3 0 016 0V9"/><circle cx="10" cy="14" r="1" fill="currentColor"/></svg>
+          <span data-i18n="bs_hl2_label">Privacy by Design / DSGVO-ready</span>
+        </p>
+        <p class="detail-content__text" data-i18n="bs_hl2_text">
+          Vollständig vorbereitet für den sensiblen deutschen Markt durch lokal gehostete Typografie (kein Datenabfluss an Google-Server) und ein datenschutzkonformes Fehler-Tracking via Sentry mit DE-Ingest in Frankfurt.
+        </p>
+      </div>
+      <div class="detail-content__section">
+        <p class="detail-content__section-label">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;margin-right:6px;flex-shrink:0"><rect x="2" y="5" width="16" height="12" rx="1.5"/><polyline points="2,5 10,12 18,5"/></svg>
+          <span data-i18n="bs_hl3_label">Automatisierte Workflows</span>
+        </p>
+        <p class="detail-content__text" data-i18n="bs_hl3_text">
+          Voll integrierte transaktionale E-Mail-Infrastruktur über Resend für automatisierte Bestätigungen, Absagen und zeitgesteuerte 24h-Terminerinnerungen ohne zusätzliche API-Overheads.
+        </p>
+      </div>
+
+      <a href="https://viktors-barbershop-demo.vercel.app/" target="_blank" rel="noopener" class="detail-content__cta">
+        <span data-i18n="bs_cta">Live ansehen</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- PREVIEW -->
+  <section class="detail-preview">
+    <p class="detail-preview__label" data-i18n="bs_preview_label">Vorschau</p>
+    <p class="preview-hint">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      <span data-i18n="bs_hint">Klicke dich durch…</span>
+    </p>
+
+    <div class="preview-grid">
+
+      <!-- Live iframe, full width -->
+      <div class="preview-card preview-card--wide preview-card--iframe" id="card-main">
+        <iframe
+          class="preview-card__inner"
+          src="https://viktors-barbershop-demo.vercel.app/"
+          title="Barbershop Booking System Live"
+          loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-forms"
+        ></iframe>
+        <span class="preview-card__label">Live Demo</span>
+      </div>
+
+      <!-- Feature card: Auth -->
+      <div class="preview-card" id="card-auth" style="background:#1A1A1A; min-height:240px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; padding:32px;">
+        <div data-i18n="bs_auth_label" style="font-family:'Inter',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.1em; color:#888; text-transform:uppercase;">Passwortloser Login</div>
+        <div style="background:#2A2A2A; border:1px solid #333; border-radius:10px; padding:16px 20px; width:100%; max-width:260px;">
+          <div data-i18n="bs_auth_input" style="font-size:12px; color:#666; margin-bottom:8px;">E-Mail eingeben</div>
+          <div style="background:#333; border-radius:6px; height:36px; display:flex; align-items:center; padding:0 12px;">
+            <div style="width:120px; height:2px; background:#555; border-radius:2px;"></div>
+            <div style="width:8px; height:16px; background:#888; margin-left:4px; border-radius:1px; animation: blink 1s step-end infinite;"></div>
+          </div>
+        </div>
+        <div data-i18n="bs_auth_btn" style="background:#D4AF6A; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; color:#1A1A1A; width:100%; max-width:260px; text-align:center;">Code per E-Mail senden</div>
+        <span class="preview-card__label">OTP Auth</span>
+      </div>
+
+      <!-- Feature card: Stack -->
+      <div class="preview-card" id="card-stack" style="background:#F7F5F0; min-height:240px; padding:28px;">
+        <div style="font-family:'Inter',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.1em; color:var(--ink-faint); text-transform:uppercase; margin-bottom:20px;">Tech Stack</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#3ECF8E"><path d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C.111 12.876.636 14 1.664 14H11V22.964c.015.986 1.26 1.41 1.874.637l9.262-11.65c.653-.826.128-1.951-.9-1.951H13V1.036z"/></svg>
+            <span style="font-size:14px; color:var(--ink-soft);">Supabase, Auth &amp; Database</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B5FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span data-i18n="bs_stack_resend" style="font-size:14px; color:var(--ink-soft);">Resend, Transaktionale E-Mails</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#362D59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span style="font-size:14px; color:var(--ink-soft);">Sentry, Error Monitoring</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#000000"><path d="M12 2L2 19.5h20L12 2z"/></svg>
+            <span style="font-size:14px; color:var(--ink-soft);">Vercel, Hosting &amp; CI/CD</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E44D26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span data-i18n="bs_stack_html" style="font-size:14px; color:var(--ink-soft);">Pure HTML / CSS / JS, kein Framework</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="detail-footer-new">
+    <a href="index.html" class="detail-footer-new__back" data-i18n="back_portfolio">← Zurück zum Portfolio</a>
+    <span class="detail-footer-new__copy">© 2026 Viktor Weber</span>
+    <div></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script>
+    // Click sound via Web Audio API
+    function playClick() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.1);
+      } catch(e) {}
+    }
+
+    document.querySelectorAll('.preview-card').forEach(card => {
+      card.addEventListener('click', playClick);
+    });
+  </script>
+
+  <style>
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  </style>
+</body>
+</html>
